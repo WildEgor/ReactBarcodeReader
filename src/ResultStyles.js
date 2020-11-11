@@ -4,6 +4,9 @@ const style = {
         padding: "5rem",
         backgroundColor: "rgb(59, 59, 59)",
         color: "white"
+    },
+    someText: {
+        fontSize: "2rem"
     }
 };
 

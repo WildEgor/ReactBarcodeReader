@@ -2,53 +2,80 @@ import React, { Component } from 'react'
 import Quagga from 'quagga'
 
 class Scanner extends Component {
+  constructor(props) {
+    super(props);
+    
+    this.state = {
+      funcCode: 'code_128_reader',
+      patchSize: 'x-small'
+    };
+  }
+
   componentDidMount() {
-    Quagga.init(
-      {
-        inputStream: {
-          type: 'LiveStream',
-          constraints: {
-            width: 1280,
-            height: 720,
-            facingMode: 'enviroment', // or user
-          },
-        },
-        locator: {
-          patchSize: 'medium',
-          halfSample: false,
-        },
-        numOfWorkers: 2,
-        decoder: {
-          readers: [
-            //'code_128_reader',
-            //'ean_reader',
-            //'ean_8_reader',
-            'code_39_reader',
-            //'code_39_vin_reader'
-            //'codabar_reader'
-            //'upc_reader',
-            //'upc_e_reader'
-            //'i2of5_reader',
-            //'2of5_reader',
-            //'code_93_reader'
-          ],
-        },
-        locate: true,
-        frequency: 5
-      },
-      function(err) {
-        if (err) {
-          return console.log(err)
-        }
-        Quagga.start()
-      },
-    )
+    this._UpdateScanner(this.state.funcCode, this.state.patchSize)
+    console.log(this.state.funcCode)
+    console.log(this.state.patchSize)
     Quagga.onDetected(this._onDetected)
     Quagga.onProcessed(this._onProcessed)
   }
 
   componentWillUnmount() {
     Quagga.offDetected(this._onDetected)
+  }
+
+  shouldComponentUpdate(nextProps, nextState){
+    let curFuncCode = this.state.funcCode;
+    let curPatchSize = this.state.patchSize;
+    let newFuncCode = this.props.config.funcCode;
+    let newPatchSize = this.props.config.patchSize;
+
+    if((curFuncCode != newFuncCode) && (curPatchSize != newPatchSize)){
+
+      console.log("UPDATE")
+      this.setState({funcCode: newFuncCode})
+      this.setState({patchSize: newPatchSize})
+      console.log(newFuncCode)
+      console.log(newPatchSize)
+      console.log(this.state.funcCode)
+      console.log(this.state.patchSize)
+      Quagga.stop()
+      this._UpdateScanner(newFuncCode, newPatchSize)
+      return true
+    }
+    return false
+  }
+
+  _UpdateScanner = (readerType, patchSize) => {
+    if ((readerType != null || readerType != undefined) && (patchSize != null || patchSize != undefined)){
+      Quagga.init(
+        {
+          inputStream: {
+            type: 'LiveStream',
+            constraints: {
+              width: 1280,
+              height: 200,
+              facingMode: 'enviroment', // or user
+            },
+          },
+          locator: {
+            patchSize: patchSize,
+            halfSample: false,
+          },
+          numOfWorkers: 2,
+          decoder: {
+            readers: [readerType],
+          },
+          locate: true,
+          frequency: 5
+        },
+        function(err) {
+          if (err) {
+            return false
+          }
+          Quagga.start()
+        },
+      )
+    }
   }
 
   _onProcessed = result => {

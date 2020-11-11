@@ -18,14 +18,14 @@
 .results {
  display: flex;
  width: 100%;
- background-color: rgb(48, 48, 48);
+ background-color: rgb(173, 173, 173);
+ box-shadow: 0 0 50px rgba(0,0,0,0.8); /* Параметры тени */
 }
 
 .viewport {
   position: relative;
   width: 1280px;
-  height: 720px;
-  box-shadow: 0 0 50px rgba(0,0,0,0.8); /* Параметры тени */
+  height: 200px;
 }
 
 
@@ -38,7 +38,7 @@
   padding: 1.5rem;
   border: 0;
   transition: all 0.5s;
-  border-radius: 10px;
+  border-radius: 10px 10px 0 0;
   width: auto;
   position: relative;
 }
@@ -46,7 +46,7 @@
 .btn-1:hover {
       background: #797979;
       transition: all 0.5s;
-      border-radius: 10px;
+      border-radius: 15px 15px 0 0;
       box-shadow: 0px 6px 15px #cacaca61;
-      padding: 1.5rem 3.5rem 1.5rem 1.5rem;
+      padding: 1.5rem 3.5rem 1.5rem 3.5rem;
 }
