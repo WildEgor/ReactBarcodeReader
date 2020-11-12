@@ -5,11 +5,14 @@
   "keywords": [],
   "main": "src/index.js",
   "dependencies": {
-    "quagga": "0.12.1",
-    "react": "16.5.2",
-    "react-dom": "16.5.2",
+    "@ramonak/react-excel": "^1.0.1",
+    "barcodelookup": "^1.0.6",
+    "quagga": "^0.12.1",
+    "react": "^16.14.0",
+    "react-dom": "^16.14.0",
     "react-request": "^3.1.2",
-    "react-scripts": "2.0.3"
+    "react-scripts": "2.0.3",
+    "react-select": "^3.1.0"
   },
   "devDependencies": {},
   "scripts": {

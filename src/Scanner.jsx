@@ -6,15 +6,37 @@ class Scanner extends Component {
     super(props);
     
     this.state = {
-      funcCode: 'code_128_reader',
-      patchSize: 'x-small'
+      config: {
+        inputStream : {
+          name : "Live",
+          type : "LiveStream",
+          target: document.querySelector('#myScanner'),   // Or '#yourElement' (optional)
+          constraints: {
+            width: 1920,
+            height: 200,
+            facingMode: 'enviroment', // or user
+          },
+        },
+        locator: {
+          patchSize: 'medium',
+          halfSample: false,
+        },
+        numOfWorkers: 2,
+        decoder: {
+          readers: ['code_39_reader'],
+        },
+        locate: true,
+        frequency: 1
+      }
     };
   }
 
+  configSettings = () => {
+    return this.state.config
+  }
+
   componentDidMount() {
-    this._UpdateScanner(this.state.funcCode, this.state.patchSize)
-    console.log(this.state.funcCode)
-    console.log(this.state.patchSize)
+    this._UpdateScanner()
     Quagga.onDetected(this._onDetected)
     Quagga.onProcessed(this._onProcessed)
   }
@@ -24,58 +46,54 @@ class Scanner extends Component {
   }
 
   shouldComponentUpdate(nextProps, nextState){
-    let curFuncCode = this.state.funcCode;
-    let curPatchSize = this.state.patchSize;
-    let newFuncCode = this.props.config.funcCode;
-    let newPatchSize = this.props.config.patchSize;
+    let config = this.state.config;
+    if((nextProps.config.funcCode !== config.decoder.readers[0]) || (nextProps.config.patchSize !== config.locator.patchSize) || (nextProps.config.freqSpeed !== config.frequency)){
+      console.log("UPDATE PROCESS START!")
 
-    if((curFuncCode != newFuncCode) && (curPatchSize != newPatchSize)){
+      let newArray = []
+      newArray.pop()
+      newArray.push(nextProps.config.funcCode)
 
-      console.log("UPDATE")
-      this.setState({funcCode: newFuncCode})
-      this.setState({patchSize: newPatchSize})
-      console.log(newFuncCode)
-      console.log(newPatchSize)
-      console.log(this.state.funcCode)
-      console.log(this.state.patchSize)
+      this.setState(prevState => ({
+        config: {
+          ...prevState.config,           // copy all other key-value pairs 
+          locator: {                     // specific object 
+            ...prevState.config.locator,   // copy all 
+            patchSize: nextProps.config.patchSize // update value of specific key
+          },
+          decoder: {
+            ...prevState.config.decoder,
+            readers: newArray, 
+          },
+          frequency: nextProps.config.freqSpeed
+        }
+      }))
+
+      console.log('NEW DATA');
+      console.log(this.state.config.decoder.readers[0])
+      console.log(this.state.config.locator.patchSize)
+      console.log('UP...');
+      
       Quagga.stop()
-      this._UpdateScanner(newFuncCode, newPatchSize)
+      this._UpdateScanner()
       return true
+    } else {
+      return false
     }
-    return false
   }
 
-  _UpdateScanner = (readerType, patchSize) => {
-    if ((readerType != null || readerType != undefined) && (patchSize != null || patchSize != undefined)){
+  _UpdateScanner = () => {
+      console.log('UPDATED');
+      console.log(this.state);
       Quagga.init(
-        {
-          inputStream: {
-            type: 'LiveStream',
-            constraints: {
-              width: 1280,
-              height: 200,
-              facingMode: 'enviroment', // or user
-            },
-          },
-          locator: {
-            patchSize: patchSize,
-            halfSample: false,
-          },
-          numOfWorkers: 2,
-          decoder: {
-            readers: [readerType],
-          },
-          locate: true,
-          frequency: 5
-        },
+        this.configSettings(),
         function(err) {
           if (err) {
-            return false
+          } else {
+            Quagga.start()
           }
-          Quagga.start()
         },
       )
-    }
   }
 
   _onProcessed = result => {
@@ -104,11 +122,11 @@ class Scanner extends Component {
   }
 
   _onDetected = result => {
-    this.props.onDetected(result)
+      this.props.onDetected(result)
   }
 
   render() {
-    return <div id="interactive" className="viewport" />
+    return <div id="interactive" className="viewport"/>
   }
 }
 

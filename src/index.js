@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import ReactDOM from 'react-dom'
 import Scanner from './Scanner'
 import Result from './Result'
-import Selector from './Selector'
+import Select from 'react-select'
 import './styles.css';
 
 class App extends Component {
@@ -12,22 +12,32 @@ class App extends Component {
       scanning: false,
       myConfig: { 
         funcCode: "code_128_reader",
-        patchSize: "x-small"
+        patchSize: "x-small",
+        freqSpeed: 5
       },
-      optionsFuncCode: [
-        {value: "code_128_reader", label:"code_128"}, 
-        {value: "code_39_reader", label: "code_39"},
-        {value: "upc_reader", label: "upc"}
-        ],
-      optionsPatchSize: [
-        {value: "x-small", label:"x-small"}, 
-        {value: "small", label: "small"},
-        {value: "medium", label: "medium"}
-        ],
+      Settings: {
+        optionsFuncCode: [
+          {value: "code_128_reader", label:"code_128"}, 
+          {value: "code_39_reader", label: "code_39"},
+          {value: "upc_reader", label: "upc"},
+          {value: "ean_reader", label: "ean"}
+          ],
+        optionsPatchSize: [
+          {value: "x-small", label:"x-small"}, 
+          {value: "small", label: "small"},
+          {value: "medium", label: "medium"},
+          {value: "large", label: "large"}
+          ],
+        optionsFreq: [
+          {value: 1, label:"very slow"}, 
+          {value: 5, label: "slow"},
+          {value: 15, label: "medium"},
+          {value: 20, label: "fast"}
+          ]
+      },
       results: [],
     }
 
-    this.handleChange = this.handleChange.bind(this);
   }
 
   _scan = () => {
@@ -36,30 +46,6 @@ class App extends Component {
 
   _onDetected = result => {
     this.setState({ results: this.state.results.concat([result]) })
-  }
-
-  handleChange(e) {
-    if (e.target.name == 'decoder_readers'){
-      console.log("SELECTORDECODER")
-      let value = e.target.value;
-      this.setState(prevState => ({
-        myConfig: {                   // object that we want to update
-            ...prevState.myConfig,    // keep all other key-value pairs
-            funcCode: value       // update the value of specific key
-        }
-    }))
-    }
-    if (e.target.name == 'locator_patch-size'){
-      console.log("SELECTORLOCATOR")
-      let value = e.target.value;
-      this.setState(prevState => ({
-        myConfig: {                   // object that we want to update
-            ...prevState.myConfig,    // keep all other key-value pairs
-            patchSize: value       // update the value of specific key
-        }
-    }))
-    }
-    console.log(this.state.myConfig)
   }
 
   render() {
@@ -74,20 +60,16 @@ class App extends Component {
           <div>
             <div>
             <label>
-              <span>Barcode-Type</span>
-              <select name="decoder_readers" onChange={this.handleChange}>
-                {
-                  this.state.optionsFuncCode.map((option, i) => ( <option key={i} value={option.value}>{option.label}</option> ))
-                }
-              </select>
+              <span>Select speed</span>
+              <Select name="select_speed" options={this.state.Settings.optionsFreq} onChange={value => this.setState(prevState => ({myConfig: {...prevState.myConfig, freqSpeed: value.value}}) )}/>
             </label>
             <label>
-                <span>Patch-Size</span>
-                <select name="locator_patch-size" onChange={this.handleChange}>
-                  {
-                    this.state.optionsPatchSize.map((option, i) => ( <option key={i} value={option.value}>{option.label}</option> ))
-                  }
-                </select>
+              <span>Barcode-Type</span>
+              <Select name="decoder_readers" options={this.state.Settings.optionsFuncCode} onChange={value => this.setState(prevState => ({myConfig: {...prevState.myConfig, funcCode:  value.value}}) )}/>
+            </label>
+            <label>
+            <span>Patch-Size</span>
+              <Select name="locator_patch" options={this.state.Settings.optionsPatchSize} onChange={value => this.setState(prevState => ({myConfig: {...prevState.myConfig, patchSize: value.value}}) )}/>
             </label>
             </div>
             </div>

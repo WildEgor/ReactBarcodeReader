@@ -7,6 +7,13 @@ const style = {
     },
     someText: {
         fontSize: "2rem"
+    },
+    flexBox: {
+        display: "flex",
+        flexDirection: "column",
+        width: "200px",
+        hight: "100px",
+        overflow: "hidden"
     }
 };
 
