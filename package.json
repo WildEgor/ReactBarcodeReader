@@ -7,6 +7,7 @@
   "dependencies": {
     "@ramonak/react-excel": "^1.0.1",
     "barcodelookup": "^1.0.6",
+    "js2excel": "^1.0.1",
     "quagga": "^0.12.1",
     "react": "^16.14.0",
     "react-dom": "^16.14.0",

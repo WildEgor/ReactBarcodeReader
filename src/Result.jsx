@@ -26,13 +26,10 @@ const Result = props => {
     const typeBar = barcode.replace(/-/g, '').toLowerCase();
     const urlAdd = `https://api.barcodelookup.com/v2/products?barcode=${typeBar}&formatted=y&key=8z9350lnic2gms9n5gs2mauisfrphs`; 
 
-    var myHeaders = new Headers({
-      'Content-Type': 'text/plain',
-      'X-Custom-Header': 'hello world'
-    });
+    //getDataHTTP();
     
     return (
-    <Fetch url={urlAdd} mode= {'no-cors'} referrerPolicy={'origin'} responseType="json" headers={myHeaders} onResponse={() => { setRequest(!request); }}>
+    <Fetch url={urlAdd} onResponse={() => { setRequest(!request); }}>
       {({ fetching, failed, data }) => {
         
         if (fetching) {
@@ -56,6 +53,21 @@ const Result = props => {
     }}
     </Fetch>
     )
+  }
+
+  const getDataHTTP = () => {
+    var url = "https://api.barcodelookup.com/v2/products?barcode=4025515154860&formatted=y&key=8z9350lnic2gms9n5gs2mauisfrphs";
+
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", url);
+
+    xhr.onreadystatechange = function () {
+   if (xhr.readyState === 4) {
+      console.log(xhr.status);
+      console.log(xhr.responseText);
+   }};
+
+    xhr.send();
   }
 
   const _renderInput = res => {
