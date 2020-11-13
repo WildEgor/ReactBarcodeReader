@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom'
 import Scanner from './Scanner'
 import Result from './Result'
 import Select from 'react-select'
+import ExcelForm from './ReadExcel'
 import './styles.css';
 
 class App extends Component {
@@ -51,7 +52,7 @@ class App extends Component {
   render() {
     return (
       <div className="scannerWindow">
-        <button className="btn-1" onClick={this._scan}>
+        <button className="btn-1 btn-1-green" onClick={this._scan}>
               {this.state.scanning ? 'Stop' : 'Start'}
         </button>
         <div className="results">
@@ -76,6 +77,7 @@ class App extends Component {
             : null}</div>
         </div>
         <Result result = {this.state.results}/>
+        <ExcelForm />
       </div>
     )
   }

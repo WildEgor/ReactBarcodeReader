@@ -6,14 +6,24 @@ const style = {
         color: "white"
     },
     someText: {
-        fontSize: "2rem"
+        fontSize: "1rem"
     },
     flexBox: {
         display: "flex",
-        flexDirection: "column",
-        width: "200px",
-        hight: "100px",
+        flexDirection: "row",
+        width: "350px",
+        hight: "250px",
         overflow: "hidden"
+    },
+    inputBarcode: {
+        fontSize: "2rem",
+        display: "flex",
+        padding: "5px 5px",
+        width: "100%",
+        margin: "0 auto"
+    },
+    someArea: {
+        width: "200px"
     }
 };
 

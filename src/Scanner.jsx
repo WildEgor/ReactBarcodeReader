@@ -1,105 +1,56 @@
-import React, { Component } from 'react'
+import React, { useEffect, useState } from 'react'
 import Quagga from 'quagga'
 
-class Scanner extends Component {
-  constructor(props) {
-    super(props);
-    
-    this.state = {
-      config: {
-        inputStream : {
-          name : "Live",
-          type : "LiveStream",
-          target: document.querySelector('#myScanner'),   // Or '#yourElement' (optional)
-          constraints: {
-            width: 1920,
-            height: 200,
-            facingMode: 'enviroment', // or user
-          },
+const Scanner = props => {
+  const [config, setConfig] = useState(
+    {
+      inputStream : {
+        name : "Live",
+        type : "LiveStream",
+        target: document.querySelector('#myScanner'),   // Or '#yourElement' (optional)
+        constraints: {
+          width: 1920,
+          height: 200,
+          facingMode: 'enviroment', // or user
         },
-        locator: {
-          patchSize: 'medium',
-          halfSample: false,
-        },
-        numOfWorkers: 2,
-        decoder: {
-          readers: ['code_39_reader'],
-        },
-        locate: true,
-        frequency: 1
-      }
-    };
-  }
-
-  configSettings = () => {
-    return this.state.config
-  }
-
-  componentDidMount() {
-    this._UpdateScanner()
-    Quagga.onDetected(this._onDetected)
-    Quagga.onProcessed(this._onProcessed)
-  }
-
-  componentWillUnmount() {
-    Quagga.offDetected(this._onDetected)
-  }
-
-  shouldComponentUpdate(nextProps, nextState){
-    let config = this.state.config;
-    if((nextProps.config.funcCode !== config.decoder.readers[0]) || (nextProps.config.patchSize !== config.locator.patchSize) || (nextProps.config.freqSpeed !== config.frequency)){
-      console.log("UPDATE PROCESS START!")
-
-      let newArray = []
-      newArray.pop()
-      newArray.push(nextProps.config.funcCode)
-
-      this.setState(prevState => ({
-        config: {
-          ...prevState.config,           // copy all other key-value pairs 
-          locator: {                     // specific object 
-            ...prevState.config.locator,   // copy all 
-            patchSize: nextProps.config.patchSize // update value of specific key
-          },
-          decoder: {
-            ...prevState.config.decoder,
-            readers: newArray, 
-          },
-          frequency: nextProps.config.freqSpeed
-        }
-      }))
-
-      console.log('NEW DATA');
-      console.log(this.state.config.decoder.readers[0])
-      console.log(this.state.config.locator.patchSize)
-      console.log('UP...');
-      
-      Quagga.stop()
-      this._UpdateScanner()
-      return true
-    } else {
-      return false
+      },
+      locator: {
+        patchSize: 'medium',
+        halfSample: false,
+      },
+      numOfWorkers: 2,
+      decoder: {
+        readers: ['code_39_reader'],
+      },
+      locate: true,
+      frequency: 1
     }
+  )
+
+  const [_Updater, setUpdater] = useState(true)
+
+  const configSettings = () => {
+    return config
   }
 
-  _UpdateScanner = () => {
-      console.log('UPDATED');
-      console.log(this.state);
-      Quagga.init(
-        this.configSettings(),
-        function(err) {
-          if (err) {
-          } else {
-            Quagga.start()
-          }
-        },
-      )
+  const _UpdateScanner = () => {
+    setUpdater(!_Updater)
+    console.log('UPDATED');
+    console.log(config)
+    Quagga.init(
+      configSettings(),
+      function(err) {
+        if (err) {
+        } else {
+          Quagga.start()
+        }
+      },
+    )
   }
 
-  _onProcessed = result => {
+  const _onProcessed = result => {
     var drawingCtx = Quagga.canvas.ctx.overlay, 
         drawingCanvas = Quagga.canvas.dom.overlay;
-
         if (result) {
           if (result.boxes) {
               drawingCtx.clearRect(0, 0, parseInt(drawingCanvas.getAttribute("width")), parseInt(drawingCanvas.getAttribute("height")));
@@ -121,13 +72,49 @@ class Scanner extends Component {
       }
   }
 
-  _onDetected = result => {
-      this.props.onDetected(result)
+  const _onDetected = result => {
+      props.onDetected(result)
   }
 
-  render() {
-    return <div id="interactive" className="viewport"/>
+  const _shouldComponentUpdate = (param) => {
+    console.log("UPDATE PROCESS START!")
+    console.log(config)
+
+    let newArray = []
+      newArray.pop()
+      newArray.push(props.config.funcCode)
+
+    setConfig({...config,
+      locator: {
+        patchSize: props.config.patchSize
+      },
+      decoder: {
+        readers: newArray
+      },
+      frequency: props.config.freqSpeed
+    })
+    Quagga.stop();
+    _UpdateScanner();
   }
+
+  useEffect(() => {
+    const _Update_ = _Updater ? _UpdateScanner() : false;
+
+    if((props.config.funcCode != config.decoder.readers[0]) || (props.config.patchSize != config.locator.patchSize) || (props.config.freqSpeed != config.frequency)){
+      console.log('THIS IS MY PROP');
+      _shouldComponentUpdate();
+    }
+    
+    Quagga.onDetected(_onDetected);
+    Quagga.onProcessed(_onProcessed);
+    return () => {
+      Quagga.offDetected(_onDetected);
+    }
+  })
+
+  return (
+    <div id="interactive" className="viewport"/>
+  );
 }
 
 export default Scanner
