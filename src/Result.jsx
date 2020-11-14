@@ -1,11 +1,12 @@
-import React, { useState } from 'react'
-import { Fetch } from 'react-request';
+import React, { useState, useEffect } from 'react'
+import { Fetch } from 'react-data-fetching';
+//import { Loader } from './components'
 import style from './ResultStyles.js';
-import bc, { lookup } from 'barcodelookup';
 
 const Result = props => {
   const [request, setRequest] = useState(false);
   const [barcode, setBarcode] = useState('123-123-123-123');
+  const [partNumber, setPartNumber] = useState('');
 
   const handleClick = res => {
     setRequest(!request);
@@ -22,52 +23,58 @@ const Result = props => {
     setBarcode(event.currentTarget.value)
   };
 
-  const _HTTPRequest = barcode => {
-    const typeBar = barcode.replace(/-/g, '').toLowerCase();
-    const urlAdd = `https://api.barcodelookup.com/v2/products?barcode=${typeBar}&formatted=y&key=8z9350lnic2gms9n5gs2mauisfrphs`; 
 
-    //getDataHTTP();
-    
-    return (
-    <Fetch url={urlAdd} onResponse={() => { setRequest(!request); }}>
-      {({ fetching, failed, data }) => {
-        
-        if (fetching) {
-          console.log(typeBar)
-          console.log('Loading data...')
-          return <div>Loading data...</div>;
-        }
+  const parseData = (data) => {
 
-        if (failed) {
-          console.log('The request did not succeed.')
-          return <div>The request did not succeed.</div>;
-        }
+    if (typeof data !== "undefined"){
+      let obj = data.products[0];
 
-        if (data) {
-          return (
-            console.log(data)
-          );
-        }
+      let partnumber = obj.mpn;
 
-        return <div></div>;
-    }}
-    </Fetch>
-    )
+      let model = obj.model;
+      let prodName = obj.product_name;
+      let prodTitle = obj.title;
+      let prodCat = obj.category;
+      let prodManuf = obj.manufacturer;
+      let prodBrand = obj.brand;
+      let prodDesc = obj.description;
+      let prodImage = obj.images[0];
+      console.log(prodImage);
+
+      return (
+        <div className ="product">
+          <img className="product-image" src={prodImage} alt=""/>
+            <div className="product-form">
+              <div>
+                <h1>{`Наименование: ${prodTitle} | Имя продукта: ${prodName} | Партномер: ${partnumber}`}</h1>
+                <h1>Описание</h1>
+                <p>{`Производитель: ${prodManuf} | Товар: ${prodBrand} | Категория: ${prodCat}`}</p>
+                <p>{prodDesc}</p>
+              </div>
+            </div>
+        </div>
+      )
+    }
+    return null
   }
 
-  const getDataHTTP = () => {
-    var url = "https://api.barcodelookup.com/v2/products?barcode=4025515154860&formatted=y&key=8z9350lnic2gms9n5gs2mauisfrphs";
 
-    var xhr = new XMLHttpRequest();
-    xhr.open("GET", url);
+  const _HTTPRequest = barcode => {
+    const typeBar = barcode.replace(/-/g, '').toLowerCase();
+    const apiKey = '8z9350lnic2gms9n5gs2mauisfrphs';
+    const urlAdd = `https://api.barcodelookup.com/v2/products?barcode=${typeBar}&formatted=y&key=${apiKey}`; 
 
-    xhr.onreadystatechange = function () {
-   if (xhr.readyState === 4) {
-      console.log(xhr.status);
-      console.log(xhr.responseText);
-   }};
-
-    xhr.send();
+    return (
+      <div>
+        <Fetch
+          loader={<div>Loading...</div> } // Replace this with your lovely handcrafted loader
+          url= {urlAdd}
+          timeout={5000}
+        >
+          {({ data }) => parseData(data) }
+        </Fetch>
+      </div>
+    )
   }
 
   const _renderInput = res => {
@@ -79,34 +86,47 @@ const Result = props => {
 
       res.map((barcode, i) => { if (barcodeLen === i + 1) { lastResult = barcode; } });
 
-      return (  
-      <div id="myDiv" style={style.resBox}><p style={style.someText}>
-        <div style={style.flexBox}>
-           <ul>{lastRes.map((item, index) => <li key={index.toString()}>{item}</li>)}</ul>
-        </div>
-      </p>
-      <div>
-          <p>{lastResult.codeResult.code}[{lastResult.codeResult.format}]</p>
-          <input id="myInput" style={style.inputBarcode} onChange={onChange} placeholder="Введите номер штрихкода...">
-          </input>
-          <button className="btn-1 btn-1-blue">Изменить</button>
-          <button className="btn-1 btn-1-red">Удалить</button>
-          <button className="btn-1 btn-1-green">Добавить</button>
-          <button className="btn-1 btn-1-yellow" onClick={() => handleClick(lastResult)}>{request ? 'Выполняется запрос...' : 'Запросить'}</button>
-      </div>
-      {request ? _HTTPRequest(barcode) : null}</div>
+      return (
+          <div id="myForm" style={style.resColumnBox}>
+          <div style={style.resBox}>
+          <p style={style.someText}>Последние 10 сканированных штрихкодов</p>
+                <div style={style.flexBox}>
+                  <ul>{lastRes.map((item, index) => <li key={index.toString()}>{item}</li>)}</ul>
+                </div>
+            <div>
+                <p>{lastResult.codeResult.code}[{lastResult.codeResult.format}]</p>
+              <input id="myInput" style={style.inputBarcode} onChange={onChange} placeholder="Введите номер штрихкода...">
+              </input>
+              <button className="btn-1 btn-1-blue">Изменить</button>
+              <button className="btn-1 btn-1-red">Удалить</button>
+              <button className="btn-1 btn-1-green">Добавить</button>
+              <button className="btn-1 btn-1-yellow" onClick={() => handleClick(lastResult)}>{request ? 'Выполняется запрос...' : 'Запросить'}</button>
+            </div>
+          </div>
+          <div>
+            {request ? _HTTPRequest(barcode) : null}
+          </div>
+        </div> 
       )
     } else {
-      return <div id="myDiv" style={style.resBox}><p style={style.someText}>"Нет сканированных кодов"</p>
-      <div>
-          <input id="myInput" style={style.inputBarcode} onChange={onChange} placeholder="Введите номер штрихкода...">
-          </input>
-          <button className="btn-1 btn-1-blue">Изменить</button>
-          <button className="btn-1 btn-1-red">Удалить</button>
-          <button className="btn-1 btn-1-green">Добавить</button>
-          <button className="btn-1 btn-1-yellow" onClick={() => handleClick(lastResult)}>{request ? 'Выполняется запрос...' : 'Запросить'}</button>
-      </div>
-      {request ? _HTTPRequest(barcode) : null}</div>
+      return (
+        <div id="myForm" style={style.resColumnBox}>
+        <div style={style.resBox}>
+          <p style={style.someText}>Нет скнированных штрихкодов</p>
+          <div>
+            <input id="myInput" style={style.inputBarcode} onChange={onChange} placeholder="Введите номер штрихкода...">
+            </input>
+            <button className="btn-1 btn-1-blue">Изменить</button>
+            <button className="btn-1 btn-1-red">Удалить</button>
+            <button className="btn-1 btn-1-green">Добавить</button>
+            <button className="btn-1 btn-1-yellow" onClick={() => handleClick(lastResult)}>{request ? 'Выполняется запрос...' : 'Запросить'}</button>
+          </div>
+        </div>
+        <div>
+          {request ? _HTTPRequest(barcode) : null}
+        </div>
+      </div>  
+      )
     }
   }
  

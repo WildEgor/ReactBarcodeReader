@@ -1,26 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import { ReactExcel, readFile, generateObjects } from '@ramonak/react-excel';
-import {useDropzone} from 'react-dropzone';
-import {json2excel, excel2json} from 'js2excel';
 
 const ExcelForm = () => {
     const [initialData, setInitialData] = useState(undefined);
     const [currentSheet, setCurrentSheet] = useState({});
     const [JSONTable, setJSONTable] = useState({});
 
-
-    const {getRootProps, getInputProps, open, acceptedFiles} = useDropzone({
-        // Disable click and keydown behavior
-        noClick: true,
-        noKeyboard: true
-      });
-    
-      const files = acceptedFiles.map(file => (
-        <li key={file.path}>
-          {file.path} - {file.size} bytes
-        </li>
-      ));
-  
     const handleUpload = (event) => {
       const file = event.target.files[0];
     
@@ -66,19 +51,6 @@ const ExcelForm = () => {
   
     return (
       <>
-        <div className="container">
-        <div {...getRootProps({className: 'dropzone'})}>
-          <input {...getInputProps()} />
-          <p>Drag 'n' drop some files here</p>
-          <button type="button" onClick={open}>
-            Open File Dialog
-          </button>
-        </div>
-        <aside>
-          <h4>Files</h4>
-          <ul>{files}</ul>
-        </aside>
-      </div>
         <input
           type='file'
           accept='.xlsx'

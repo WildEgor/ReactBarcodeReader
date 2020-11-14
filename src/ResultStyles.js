@@ -5,6 +5,10 @@ const style = {
         backgroundColor: "rgb(59, 59, 59)",
         color: "white"
     },
+    resColumnBox: {
+        display: "flex",
+        flexDirection: "column"
+    },
     someText: {
         fontSize: "1rem"
     },

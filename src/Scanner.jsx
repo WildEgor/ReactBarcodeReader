@@ -9,7 +9,7 @@ const Scanner = props => {
         type : "LiveStream",
         target: document.querySelector('#myScanner'),   // Or '#yourElement' (optional)
         constraints: {
-          width: 1920,
+          width: 800,
           height: 200,
           facingMode: 'enviroment', // or user
         },
