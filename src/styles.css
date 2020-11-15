@@ -37,7 +37,7 @@
   padding: 1.5rem;
   border: 0;
   transition: all 0.5s;
-  border-radius: 0 0 10px 10px;
+  border-radius: 10px 10px 0 0;
   width: auto;
   position: relative;
 }
@@ -45,7 +45,7 @@
 .btn-1:hover {
   background: #797979;
   transition: all 0.5s;
-  border-radius: 0 0 15px 15px;
+  border-radius: 15px 15px 0 0;
   box-shadow: 0px 6px 15px #cacaca61;
 }
 
