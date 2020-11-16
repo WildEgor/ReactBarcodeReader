@@ -14,6 +14,7 @@
     "react-dom": "^16.14.0",
     "react-dropzone": "^11.2.4",
     "react-json-excel": "^1.1.0",
+    "react-loader-spinner": "^3.1.14",
     "react-request": "^3.1.2",
     "react-scripts": "2.0.3",
     "react-select": "^3.1.0",

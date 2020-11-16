@@ -1,15 +1,21 @@
 import React, { useState, useEffect } from 'react'
 import { Fetch } from 'react-data-fetching';
-//import { Loader } from './components'
+import Loader from 'react-loader-spinner'
 import style from './ResultStyles.js';
+import ChangeForm from './ChangeForm'
 
 const Result = props => {
   const [request, setRequest] = useState(false);
-  const [barcode, setBarcode] = useState('123-123-123-123');
+  const [isForm, setIsForm] = useState(false);
+  const [barcode, setBarcode] = useState(null);
   const [partNumber, setPartNumber] = useState('');
 
   const handleClick = res => {
     setRequest(!request);
+  }
+
+  const openForm = () => {
+    setIsForm(!isForm);
   }
 
   const _lastTenRes = array => {
@@ -58,23 +64,32 @@ const Result = props => {
     return null
   }
 
-
   const _HTTPRequest = barcode => {
-    const typeBar = barcode.replace(/-/g, '').toLowerCase();
-    const apiKey = '8z9350lnic2gms9n5gs2mauisfrphs';
-    const urlAdd = `https://api.barcodelookup.com/v2/products?barcode=${typeBar}&formatted=y&key=${apiKey}`; 
+    if (barcode === null) {
+      console.log("ERROR")
+      setTimeout(() => {
+        setRequest(!request);
+      }, 2000)
+      return(
+        <div>Введите номер штрихкода!</div>
+      )
+    } else {
+      const typeBar = barcode.replace(/-/g, '').toLowerCase();
+      const apiKey = '8z9350lnic2gms9n5gs2mauisfrphs';
+      const urlAdd = `https://api.barcodelookup.com/v2/products?barcode=${typeBar}&formatted=y&key=${apiKey}`; 
 
-    return (
-      <div>
-        <Fetch
-          loader={<div>Loading...</div> } // Replace this with your lovely handcrafted loader
-          url= {urlAdd}
-          timeout={5000}
-        >
-          {({ data }) => parseData(data) }
-        </Fetch>
-      </div>
-    )
+      return (
+        <div>
+          <Fetch
+            loader={ <Loader type="TailSpin" color="#00BFFF" height={80} width={80} /> } 
+            url= {urlAdd}
+            timeout={5000}
+          >
+            {({ data }) => parseData(data) }
+          </Fetch>
+        </div>
+      )
+    }
   }
 
   const _renderInput = res => {
@@ -100,7 +115,7 @@ const Result = props => {
               <button className="btn-1 btn-1-blue">Изменить</button>
               <button className="btn-1 btn-1-red">Удалить</button>
               <button className="btn-1 btn-1-green">Добавить</button>
-              <button className="btn-1 btn-1-yellow" onClick={() => handleClick(lastResult)}>{request ? 'Выполняется запрос...' : 'Запросить'}</button>
+              <button className="btn-1 btn-1-yellow" onClick={() => handleClick(lastResult)}>Запросить</button>
             </div>
           </div>
           <div>
@@ -116,13 +131,12 @@ const Result = props => {
           <div>
             <input id="myInput" style={style.inputBarcode} onChange={onChange} placeholder="Введите номер штрихкода...">
             </input>
-            <button className="btn-1 btn-1-blue">Изменить</button>
-            <button className="btn-1 btn-1-red">Удалить</button>
-            <button className="btn-1 btn-1-green">Добавить</button>
-            <button className="btn-1 btn-1-yellow" onClick={() => handleClick(lastResult)}>{request ? 'Выполняется запрос...' : 'Запросить'}</button>
+            <button className="btn-1-mod btn-1-yellow" onClick={() => handleClick(lastResult)}>Запросить</button>
+            <button className="btn-1-mod btn-1-blue" onClick={() => openForm()} >{isForm? "Закрыть форму" : "Открыть форму"}</button>
           </div>
         </div>
         <div>
+          {isForm? <ChangeForm />: null}
           {request ? _HTTPRequest(barcode) : null}
         </div>
       </div>  

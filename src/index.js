@@ -12,7 +12,7 @@ class App extends Component {
     this.state = {
       scanning: false,
       myConfig: { 
-        funcCode: "code_128_reader",
+        funcCode: ["code_128_reader"],
         patchSize: "x-small",
         freqSpeed: 5
       },
@@ -60,18 +60,24 @@ class App extends Component {
           <div>{this.state.scanning ? 
           <div>
             <div>
-            <label>
               <span>Select speed</span>
-              <Select name="select_speed" options={this.state.Settings.optionsFreq} onChange={value => this.setState(prevState => ({myConfig: {...prevState.myConfig, freqSpeed: value.value}}) )}/>
-            </label>
-            <label>
+              <Select name="select_speed" options={this.state.Settings.optionsFreq} onChange={value => this.setState(prevState => ({myConfig: {...prevState.myConfig, freqSpeed: value.value}}) )}/>     
               <span>Barcode-Type</span>
-              <Select name="decoder_readers" options={this.state.Settings.optionsFuncCode} onChange={value => this.setState(prevState => ({myConfig: {...prevState.myConfig, funcCode:  value.value}}) )}/>
-            </label>
-            <label>
-            <span>Patch-Size</span>
+              <label>
+                <Select
+                  defaultValue={[this.state.Settings.optionsFuncCode[0], this.state.Settings.optionsFuncCode[1]]}
+                  isMulti
+                  name="colors"
+                  options={this.state.Settings.optionsFuncCode}
+                  className="basic-multi-select"
+                  classNamePrefix="select"
+                  onChange ={value =>  {
+                    this.setState( prevState => ( { myConfig: { ...prevState.myConfig, funcCode: {...['code_39_reader']} } } ) ) 
+                  }}
+                />
+              </label>
+              <span>Patch-Size</span>
               <Select name="locator_patch" options={this.state.Settings.optionsPatchSize} onChange={value => this.setState(prevState => ({myConfig: {...prevState.myConfig, patchSize: value.value}}) )}/>
-            </label>
             </div>
             </div>
             : null}</div>

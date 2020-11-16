@@ -80,17 +80,19 @@ const Scanner = props => {
     console.log("UPDATE PROCESS START!")
     console.log(config)
 
-    let newArray = []
-      newArray.pop()
-      newArray.push(props.config.funcCode)
+    //let newArray = []
+     // newArray.pop()
+     // newArray.push(props.config.funcCode)
 
     setConfig({...config,
       locator: {
         patchSize: props.config.patchSize
       },
+      /*
       decoder: {
-        readers: newArray
+        readers: props.config.funcCode
       },
+      */
       frequency: props.config.freqSpeed
     })
     Quagga.stop();

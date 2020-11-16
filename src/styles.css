@@ -42,6 +42,24 @@
   position: relative;
 }
 
+.btn-1-mod {
+  font-family: Hack, monospace;
+  background: #5c5c5c;
+  color: #e4e4e4;
+  cursor: pointer;
+  font-size: 1em;
+  padding: 1.5rem;
+  border: 0;
+  transition: all 0.5s;
+  border-radius: 0 0 10px 10px;
+  width: auto;
+  position: relative;
+}
+
+.btn-1-mod:hover {
+  border-radius: 0 0 15px 15px;
+}
+
 .btn-1:hover {
   background: #797979;
   transition: all 0.5s;
