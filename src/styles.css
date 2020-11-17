@@ -1,3 +1,9 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 .App {
   font-family: sans-serif;
   text-align: center;
@@ -24,8 +30,16 @@
 
 .viewport {
   position: relative;
-  width: 1280px;
+  width: 800px;
   height: 200px;
+}
+
+button:active, button:focus {
+  outline: none;
+}
+
+button::-moz-focus-inner {
+  border: 0;
 }
 
 .btn-1 {

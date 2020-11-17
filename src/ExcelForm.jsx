@@ -1,16 +1,19 @@
 import React, { useEffect, useState } from 'react'
+import Context from './Context'
 import { ReactExcel, readFile, generateObjects } from '@ramonak/react-excel';
 import XLSX from 'xlsx';
+import ChangeForm from './ChangeForm'
 
 const ExcelForm = () => {
     const [initialData, setInitialData] = useState() // При загрузке таблицы получаем начальные данные
     const [currentSheet, setCurrentSheet] = useState({}) // Храним текущее состояние таблицы
     const [excelTable, setExcelTable] = useState({}); // Храним основные данные о таблице (название текущего листа, заголовки)
     const [JSONTable, setJSONTable] = useState({}) // Храним текущее состояние таблицы в формате json
+    const [isForm, setIsForm] = useState(false);
+    const [formString, setFormString] = useState({})
 
-    const handleUpload = (event) => { // Функция чтения файла с таблицей 
+    const handleUpload = event => { // Функция чтения файла с таблицей .xlsx
       const file = event.target.files[0];
-    
       readFile(file)
         .then((readedData) => {
           setInitialData(readedData);
@@ -19,21 +22,29 @@ const ExcelForm = () => {
         .catch((error) => console.error(error));
     };
 
-    const save = () => { // Функция сохраниения данных в формат JSON и перезапись текущего файла (Только по кнопке)
-      if (typeof currentSheet !== "undefined") {
-      const result = generateObjects(currentSheet);
+    const openForm = () => {
+      setIsForm(!isForm);
+    }
 
-      setJSONTable(JSON.stringify(result, null, ' '));
+    const save = event => { // Функция сохраниения данных в формат JSON и перезапись текущего файла (Только по кнопке...)
+
+      console.log('SAVED!');
+      
+      if (Object.keys(currentSheet).length !== 0 && currentSheet.constructor === Object) {
+      console.log(currentSheet);
+      const result = generateObjects(currentSheet); // создаем объект JSON из файла .xlsx
+
+      setJSONTable(JSON.stringify(result, null, ' ')); // записываем текущее состояние как JSON
      
-      if (typeof JSONTable !== "undefined"){
-        console.log('SAVE JSON TO TABLE...'); 
-        
-        let newWB = XLSX.utils.book_new();
-        let newWS = XLSX.utils.json_to_sheet(result);
-        console.log(excelTable.name);
-        XLSX.utils.book_append_sheet(newWB, newWS, excelTable.name);
-        XLSX.writeFile(newWB, "data.xlsx");
-      }  
+        if (typeof JSONTable !== "undefined" && (event.target && event.target.name == "saveBtn")) { // при нажатии кнопки сохраняем 
+          console.log('SAVE JSON TO TABLE...'); 
+          
+          let newWB = XLSX.utils.book_new();
+          let newWS = XLSX.utils.json_to_sheet(result);
+          console.log(excelTable.name);
+          XLSX.utils.book_append_sheet(newWB, newWS, excelTable.name);
+          XLSX.writeFile(newWB, "data.xlsx");
+        }  
       }
     };
 
@@ -93,14 +104,7 @@ const ExcelForm = () => {
 
     const changerBtn = () => {
       // Тестовая строка 
-      const testString = {
-          'Артикул': 77, 
-          'Описание продукта': "aaa", 
-          'Количество всего': 4, 
-          'Продали': 2, 
-          'Остаток': 2, 
-          'Примечание': 'aaa'
-      };
+      const testString = formString;
 
       const oldObj = [...JSONTable]; // Получить данные JSON
 
@@ -116,68 +120,43 @@ const ExcelForm = () => {
 
       let bufArr = {[excelTable.name]: JSONTable}
 
-
       POSTLocal(bufArr, excelTable.name);
-
-      /*
-      const obj =  {'Артикул': 777, 'Описание продукта': "aaa", 'Количество всего': 4, 'Продали': 2, 'Остаток': 2, 'Примечание': 'aaa'};
-      const testRow = [777, "aaa", 4, 2, 2, "aaa"];
-      let bufferArr = currentSheet;
-      const oldObj = [...JSONTable];
-      console.log('CURSHET:', currentSheet);
-      
-      bufferArr['New Data'].push(testRow);
-      
-      console.log('bufferArr ', bufferArr['New Data']);
-
-      console.log('OldJSON',oldObj);
-
-      
-      oldObj.push(obj);
-      
-      setJSONTable(oldObject => {
-        let newObject = { ...oldObject };
-        newObject = [...oldObj];
-        return newObject;
-      });
-
-      console.log('NewJSON', JSONTable);
-      */
     }
     
     return (
-      <>
-        <input
-          type='file'
-          accept='.xlsx'
-          onChange={handleUpload}
-        />
-        <button onClick={save}>
-            Save
-        </button>
+      <Context.Provider value={{excelTable, formString, setFormString}}>
+        <>
+        <div style={{display: "flex"}}>
+          <input
+            className="btn-1-mod btn-1-yellow"
+            type='file'
+            accept='.xlsx'
+            onChange={handleUpload}
+          />
+          <button className="btn-1-mod btn-1-green" name="saveBtn" onClick={save}>
+              Save
+          </button>
+          <button className="btn-1-mod btn-1-blue" onClick={() => openForm()} >{isForm? "Закрыть форму" : "Открыть форму"}</button>
+        </div>
+          {isForm? <ChangeForm  />: null}
+          <ReactExcel
+            style="overflow-y:scroll;"
+            initialData={initialData}
+            onSheetUpdate={(curSheet) => {
+              setCurrentSheet(curSheet);
+              console.log('Current Sheet', currentSheet);
 
-        <button onClick={changerBtn}>
-          Changer
-        </button>
-        <ReactExcel
-          style="overflow-y:scroll;"
-          initialData={initialData}
-          onSheetUpdate={(curSheet) => {
-            setCurrentSheet(curSheet);
-            console.log('Current Sheet', currentSheet);
+              changeInfoTable(curSheet);
 
-            changeInfoTable(curSheet);
-
-            let result = generateObjects(curSheet);
-            //console.log('Result JSON', result);
-            
-            setJSONTable(result);
-            //console.log('New table: ', JSONTable);
-          }}
-          activeSheetClassName='active-sheet'
-          reactExcelClassName='react-excel'
-        />
-      </>
+              let result = generateObjects(curSheet);
+              
+              setJSONTable(result);
+            }}
+            activeSheetClassName='active-sheet'
+            reactExcelClassName='react-excel'
+          />
+        </>
+      </Context.Provider>
     );
   }
 

@@ -76,25 +76,18 @@ const Scanner = props => {
       props.onDetected(result)
   }
 
-  const _shouldComponentUpdate = (param) => {
+  const _shouldComponentUpdate = () => {
     console.log("UPDATE PROCESS START!")
     console.log(config)
 
-    //let newArray = []
-     // newArray.pop()
-     // newArray.push(props.config.funcCode)
-
-    setConfig({...config,
-      locator: {
-        patchSize: props.config.patchSize
-      },
-      /*
-      decoder: {
-        readers: props.config.funcCode
-      },
-      */
-      frequency: props.config.freqSpeed
+    setConfig(oldObject => {
+      const newObject = { ...oldObject };
+      newObject.locator.patchSize = props.config.patchSize;
+      newObject.decoder.readers = props.config.funcCode;
+      newObject.frequency = props.config.freqSpeed;
+    return newObject;
     })
+
     Quagga.stop();
     _UpdateScanner();
   }
@@ -102,11 +95,12 @@ const Scanner = props => {
   useEffect(() => {
     const _Update_ = _Updater ? _UpdateScanner() : false;
 
-    if((props.config.funcCode != config.decoder.readers[0]) || (props.config.patchSize != config.locator.patchSize) || (props.config.freqSpeed != config.frequency)){
-      console.log('THIS IS MY PROP');
-      _shouldComponentUpdate();
-    }
-    
+    if (props.config !== undefined) {
+      if(/*(props.config.funcCode != config.decoder.readers[0]) || */(props.config.patchSize != config.locator.patchSize) || (props.config.freqSpeed != config.frequency)){
+        console.log('THIS IS MY PROP', props.config);
+        _shouldComponentUpdate();
+      }
+  }
     Quagga.onDetected(_onDetected);
     Quagga.onProcessed(_onProcessed);
     return () => {

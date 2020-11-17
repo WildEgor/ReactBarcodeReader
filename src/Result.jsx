@@ -2,20 +2,14 @@ import React, { useState, useEffect } from 'react'
 import { Fetch } from 'react-data-fetching';
 import Loader from 'react-loader-spinner'
 import style from './ResultStyles.js';
-import ChangeForm from './ChangeForm'
 
 const Result = props => {
   const [request, setRequest] = useState(false);
-  const [isForm, setIsForm] = useState(false);
   const [barcode, setBarcode] = useState(null);
   const [partNumber, setPartNumber] = useState('');
 
   const handleClick = res => {
     setRequest(!request);
-  }
-
-  const openForm = () => {
-    setIsForm(!isForm);
   }
 
   const _lastTenRes = array => {
@@ -132,11 +126,9 @@ const Result = props => {
             <input id="myInput" style={style.inputBarcode} onChange={onChange} placeholder="Введите номер штрихкода...">
             </input>
             <button className="btn-1-mod btn-1-yellow" onClick={() => handleClick(lastResult)}>Запросить</button>
-            <button className="btn-1-mod btn-1-blue" onClick={() => openForm()} >{isForm? "Закрыть форму" : "Открыть форму"}</button>
           </div>
         </div>
         <div>
-          {isForm? <ChangeForm />: null}
           {request ? _HTTPRequest(barcode) : null}
         </div>
       </div>  
