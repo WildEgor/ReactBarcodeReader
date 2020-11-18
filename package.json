@@ -7,6 +7,7 @@
   "dependencies": {
     "@ramonak/react-excel": "^1.0.1",
     "barcodelookup": "^1.0.6",
+    "formik": "^2.2.5",
     "js2excel": "^1.0.1",
     "quagga": "^0.12.1",
     "react": "^16.14.0",
@@ -18,7 +19,8 @@
     "react-request": "^3.1.2",
     "react-scripts": "2.0.3",
     "react-select": "^3.1.0",
-    "xlsx": "^0.16.8"
+    "xlsx": "^0.16.8",
+    "yup": "^0.29.3"
   },
   "devDependencies": {},
   "scripts": {

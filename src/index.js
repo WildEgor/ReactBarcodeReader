@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 import ReactDOM from 'react-dom'
-import Scanner from './Scanner'
-import Result from './Result'
+import Scanner from './components/scanner/Scanner'
+import Result from './components/scanner/result/Result'
 import Select from 'react-select'
-import ExcelForm from './ExcelForm'
+import Excel from './components/excel/excel'
 import './styles.css';
 
 // Главное приложение-родитель
@@ -118,7 +118,7 @@ const App = props => {
           : null}</div>
       </div>
       <Result result = {results}/>
-      <ExcelForm />
+      <Excel />
     </div>
   )
 }
