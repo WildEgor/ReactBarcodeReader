@@ -42,8 +42,8 @@ const Result = props => {
       console.log(prodImage);
 
       return (
-        <div className ="product">
-          <img className="product-image" src={prodImage} alt=""/>
+        <div style={style.product}>
+          <img style={style.images} src={prodImage} alt=""/>
             <div className="product-form">
               <div>
                 <h1>{`Наименование: ${prodTitle} | Имя продукта: ${prodName} | Партномер: ${partnumber}`}</h1>

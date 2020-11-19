@@ -28,6 +28,13 @@ const style = {
     },
     someArea: {
         width: "200px"
+    },
+    product: {
+        display: "flex"
+    },
+    images: {
+        width: "150px",
+        height: "150px"
     }
 };
 

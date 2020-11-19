@@ -11,6 +11,7 @@ const Excel = () => {
     const [JSONTable, setJSONTable] = useState({}) // Храним текущее состояние таблицы в формате json
     const [isForm, setIsForm] = useState(false); // Открытие формы (только если загружена таблица)
     const [formString, setFormString] = useState({}) // Строка для поиска/записи/изменения
+    const [lastQuery, setLastQuery] = useState({})
 
     // Функция для чтения файла с таблицей .xlsx
     const handleUpload = event => { 
@@ -31,6 +32,7 @@ const Excel = () => {
 
     // Функция сохраниения данных в формат JSON
     const SaveToJson = () => { 
+      console.group('SaveToJson');
       if (Object.keys(currentSheet).length !== 0 && currentSheet.constructor === Object) {
     
         console.log('CurrentSheet (save): ', currentSheet);
@@ -69,7 +71,7 @@ const Excel = () => {
     };
 
     const saveBtn = () => {
-        if (typeof JSONTable !== "undefined") {
+      if (typeof JSONTable !== "undefined") {
         const result = generateObjects(currentSheet); // создаем объект JSON из файла .xlsx
         console.log('SAVE JSON TO TABLE...', currentSheet); 
         let newWB = XLSX.utils.book_new();
@@ -78,7 +80,7 @@ const Excel = () => {
         XLSX.utils.book_append_sheet(newWB, newWS, excelTable.name);
         XLSX.writeFile(newWB, "data.xlsx");
         SaveToJson();
-        }
+      }
     }
 
 // ************************************ Поиск ********************************************
@@ -91,10 +93,12 @@ const Excel = () => {
     return _regex.test(item);
   }
 
-  async function FINDLocal(table, tableFiledName, tableFieldValue){
+  async function FINDLocal(table, tableFieldName, tableFieldValue){
     const url = 'http://localhost:8081/table';
-    let results = "";
-
+    let result = "";
+    let resData = [];
+    let index = -1;
+    
     let promise = new Promise((resolve, reject) => {
       fetch(url).then(response => 
         response.json().then(data => ({
@@ -104,25 +108,34 @@ const Excel = () => {
       )
       .then(res => {
           console.log('GET \'', res.status)
-          results = res.data[table.name].filter(jsonObj => {
-            let item = jsonObj[tableFiledName];
-            return checkMatch(item, tableFieldValue);
+          resData = res.data[table.name];
+          result = res.data[table.name].filter((jsonObj, i, arr) => {
+            let item = jsonObj[tableFieldName];
+            if (checkMatch(item, tableFieldValue) && (item.length === tableFieldValue.length)) {
+              index = resData.findIndex(x => x[tableFieldName] === tableFieldValue)
+              return true;
+            } else {
+              return false;
+            }
           });
-          resolve(results);
+          result.push(index);
+          resolve(result);
       }));
     });
 
     return await promise;
   }
 // *******************************************************************************************
-  
+
+  // Если изменилась строка запроса, то ...
   useEffect (() => {
     console.log(typeof JSONTable)
     if (JSONTable.length !== 0 && JSONTable.constructor === Array) { 
-      POSTLocal();
+      QueryLocalTable(formString);
     }
-  }, [formString])
+  }, [formString]) 
 
+  // Добавить запись 
   const AddItem = (item) => {
     console.group('AddItem'); 
     let arr = []
@@ -131,36 +144,98 @@ const Excel = () => {
       arr.push(item[prop])
     }
 
-    let arrNew = currentSheet['New Data'];
-    console.log('arrNew ', arrNew);
+    let arrNew = currentSheet[excelTable.name];
+    console.log('arrOld ', arrNew);
+    console.log('arr', arr);
     
-    /*
     if (arr.length){
       arrNew.push(arr);
       console.log(arrNew); // {Артикул: "123", Описание продукта: "aaa", Количество всего: "3", Продали: "2", Остаток: "1", …}
-      setCurrentSheet((oldObject) => {
-        let newObject = { ...oldObject['New Data'] };
-        newObject = arrNew.slice();
+      console.log('arrNew ', arrNew);
+      
+      setCurrentSheet(oldObject => {
+        let newObject = { ...oldObject[excelTable.name] };
+        newObject = arrNew.splice();
         return newObject;
       });
+      setCurrentSheet(currentSheet);
     }
-    */
   }
 
-  // Запрос на добавление записи
-  const POSTLocal = () => { 
-    const testString = formString;
-    const oldObj = [...JSONTable]; // Получить данные JSON
-    console.log('Current JSONTable: ', oldObj); 
-    
-    FINDLocal(excelTable, excelTable.columns[0][0], testString[excelTable.columns[0][0]]).then(function(response){ 
-      if (response.length) {
-        console.log('Есть запись', response[0]);
-      } else {
-        console.log('Нет записи');
-        AddItem(formString);
-      }
+  // Удалить запись
+  async function DeleteItem(index){
+    console.log('DeleteItem', currentSheet);
+    let arrNew = [];
+    let promise = new Promise((resolve, reject) => {
+      arrNew = currentSheet[excelTable.name].filter((item, idx) => {
+        if (idx !== index + 1)
+          return item
+      })
+      resolve(arrNew)
     })
+    return await promise
+  }
+
+  // Запрос в таблицу
+  const QueryLocalTable = queryStr => { 
+    if (!(excelTable.columns[0][0] in queryStr)){
+      alert(`Введите хотя бы значение в поле ${excelTable.columns[0][0]}`)
+    } else {
+      let btnInd = queryStr.isBtn;
+
+      delete queryStr.isBtn
+
+      console.log('QUERY...', queryStr);
+      const oldObj = [...JSONTable]; // Получить данные JSON
+      console.log('Current JSONTable: ', oldObj); 
+
+      delete formString.status;
+      delete formString.index;
+
+      let searchField = ''
+      for (let prop in formString) {
+        searchField = prop
+      }
+
+      console.log('Search field...', searchField);
+      
+      FINDLocal(excelTable, searchField, formString[searchField]).then(
+        function(response){
+          if (response.length > 1){
+          console.log('Есть запись', response[0]);
+          console.log('По индексу', response[1]);
+          setLastQuery(response[0]);
+          setLastQuery((oldObject) => {
+            let newObject = { ...oldObject };
+            newObject.status = 'has record';
+            newObject.index = response[1];
+            return newObject;
+          });
+
+          if (btnInd === 'removeBtn'){
+            DeleteItem(response[1]).then( resolve => {
+                console.log('REMOVED', resolve);
+                console.log('REMOVED', currentSheet);
+                // **************************************************************** HERE **************************************
+              }
+            );
+          }
+        } else {
+          console.log('Нет записи');
+          setLastQuery((oldObject) => {
+            let newObject = { ...oldObject };
+            newObject.status = 'no record';
+            newObject.index = -1;
+            return newObject;
+            });
+            if (btnInd === 'addBtn'){
+              console.log('Add query...', formString);
+              AddItem(queryStr)
+            }
+          }
+        }
+      )
+    }
   }
 
   // Изменение имени таблицы, заголовков
@@ -185,7 +260,7 @@ const Excel = () => {
   };
     
     return (
-      <Context.Provider value={{excelTable, formString, setFormString}}>
+      <Context.Provider value={{excelTable, formString, setFormString, lastQuery}}>
         <>
         <div style={{display: "flex"}}>
           <input
@@ -209,7 +284,7 @@ const Excel = () => {
             initialData={initialData}
             onSheetUpdate={(curSheet) => {
               setCurrentSheet(curSheet);
-              console.log('Current Sheet', currentSheet);
+              console.log('CURRENT SHEET UPDATE', curSheet);
 
               changeInfoTable(curSheet);
 
