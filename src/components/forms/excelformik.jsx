@@ -3,91 +3,83 @@ import Context from '../../utils/context/Context'
 import { useFormik } from 'formik';
 
 const ExcelFormik = () => {
-  const {excelTable, formString, setFormString, lastQuery} = useContext(Context);
+  const {excelTable, query, setQuery, callback, setCallBack} = useContext(Context);
 
   const formik = useFormik({
     initialValues: {},
-    onSubmit: (values) => {
-      console.log('Do query with ...', values);
-      if (values.isBtn == 'resetBtn'){
-        console.log('Reset form...');
-        ProcessQuery(null);
+    onSubmit: values => {
+      let isBtn = values.isBtn
+      delete values.isBtn
+      console.group('Do query with ... (onSubmit)', values)
+      if (isBtn == 'resetBtn'){
+        console.log('Reset form... (onSubmit)')
       } else {
-        setFormString(values);
+          console.log('Query in process... (onSubmit)')
+          setQuery(oldQuery => {
+            let newQuery = {...oldQuery}
+            newQuery.str = values 
+            newQuery.type = isBtn
+            return newQuery
+          })
       }
     },
     enableReinitialize: true
   });
 
-  // Компонент появляется и исчезает (логика). При первом появлении формы проверяем, если какая таблица открыта
+  const ResetForm = () => {
+    let formArr = Array.from(document.querySelectorAll('form'));
+    console.group('ResetForm')
+    console.log('Forma', formArr)
+    //formik.resetForm({})
+  }
+
+  // При первом появлении формы проверяем, если какая таблица открыта. При закрытии очищаем форму
   useEffect(() => {
     console.log('componentDidMount!');
-    formik.initialValues = _InitFormik(excelTable.columns[0]);
+    formik.initialValues = _InitFormik(excelTable.columns);
     return () => {
         console.log('componentWillUnmount!');
-        ProcessQuery(null);
     };
   }, []); 
 
-  // После нажатия на кнопку "Поиск" выполнить обработку запроса / по кнопке или событию выполнить "Сброс"
-  const ProcessQuery = lastQuery => {
-    let newFormArr = []
-    let formArr = Array.from(document.querySelectorAll('form'));
-
-    if (lastQuery) {
-      console.log('Fill form...', lastQuery);
-      for (let prop in lastQuery) {
-        newFormArr.push(lastQuery[prop]);
-        formik.values[prop] = lastQuery[prop];
-      }
-      newFormArr.forEach ((item, idx) => {
-        formArr[0][idx + 1].value = item;
-      })
-    } else {
-      console.log('Reset form...');
-      for (let idx = 0; idx < excelTable.columns[0].length; idx++) {
-        formArr[0][idx + 1].value = "";
-      }
-      formik.resetForm({})
-      console.log(formArr[0][0]);
-    }
-  }
-
-  // Обработка значения, после Поиск от таблицы
+  // Обработка callback
   useEffect(() => {
-    console.group('Back query: ', lastQuery);
-    if ('status' in lastQuery){
-      switch (lastQuery['status']){
-        case 'no record': 
-        ProcessQuery(null);
-        alert('Запись не найдена');
-          break;
-        case 'has record': 
-        ProcessQuery(lastQuery);
-        alert(JSON.stringify(lastQuery));
-          break;
-        default: break;
-      }
+    if (callback.status.cod){
+      console.group('...Callback...')
+      console.log(callback)
+
+      setCallBack(old => {
+        let newCallback = {...old}
+        newCallback.records = []
+        newCallback.status.cod = null
+        newCallback.status.isLoading = false
+        return newCallback
+      })
+
+      setQuery(oldQuery => {
+        let newQuery = {...oldQuery}
+        newQuery.str = {} 
+        newQuery.type = ''
+        return newQuery
+      })
     }
-  }, [lastQuery])
+  }, [callback.status.cod])
   
   // Обновить поля формы
-  const _InitFormik = ArrCol => {
+  const _InitFormik = arrCol => {
     let str = ''; 
-    ArrCol.forEach(el => {
+    arrCol.forEach(el => {
       str += `"${el}": "",`;
     })
     str = str.slice(0, -1); 
     str = '{' + str + '}'
     str = JSON.parse(str);
-    console.log(str);
     return str;
   };
 
   // Рендер формы с новыми полями таблицы
   const renderInputs = tableInfo => {
-    console.log('Changed heads excelTable', tableInfo);
-    const inputs = tableInfo.columns[0].map((value) =>
+    const inputs = tableInfo.columns.map((value) =>
       {
         return (
           <input name={value} type="text" key={value} placeholder={value} onChange={formik.handleChange} value={formik.values[value]}></input>
@@ -112,6 +104,7 @@ const ExcelFormik = () => {
               formik.setFieldValue('isBtn', e.target.name)
               formik.handleSubmit(e);
             }}>Добавить</button>
+          {callback.status.isLoading? <div>Loading...</div>: null}
           <button name="changeBtn" className="btn-1-mod" type="submit" onClick={(e)=>{
               formik.setFieldValue('isBtn', e.target.name)
               formik.handleSubmit(e);
