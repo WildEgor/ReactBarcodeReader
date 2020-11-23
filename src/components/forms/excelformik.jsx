@@ -1,9 +1,9 @@
 import React, {useContext, useEffect} from 'react';
-import Context from '../../utils/context/Context'
+import Contexts from '../../utils/context/Context'
 import { useFormik } from 'formik';
 
 const ExcelFormik = () => {
-  const {excelTable, query, setQuery, callback, setCallBack} = useContext(Context);
+  const {excelTable, query, setQuery, callback, setCallBack} = useContext(Contexts);
 
   const formik = useFormik({
     initialValues: {},
@@ -13,6 +13,7 @@ const ExcelFormik = () => {
       console.group('Do query with ... (onSubmit)', values)
       if (isBtn == 'resetBtn'){
         console.log('Reset form... (onSubmit)')
+        ResetForm()
       } else {
           console.log('Query in process... (onSubmit)')
           setQuery(oldQuery => {
@@ -27,10 +28,13 @@ const ExcelFormik = () => {
   });
 
   const ResetForm = () => {
-    let formArr = Array.from(document.querySelectorAll('form'));
+    let formArr = [...Array.from(document.querySelectorAll('#formInputs, inputs'))[0].childNodes];
     console.group('ResetForm')
     console.log('Forma', formArr)
-    //formik.resetForm({})
+    formArr.forEach(item => {
+      item.value = ""
+    })
+    formik.resetForm({})
   }
 
   // При первом появлении формы проверяем, если какая таблица открыта. При закрытии очищаем форму
@@ -44,26 +48,32 @@ const ExcelFormik = () => {
 
   // Обработка callback
   useEffect(() => {
-    if (callback.status.cod){
+    if (callback.status.isLoading){
       console.group('...Callback...')
-      console.log(callback)
-
+      console.log('Records is ', callback.records)
+      if (callback.records.length){
+        updateFields(callback)
+      } else {
+        ResetForm()
+      }
       setCallBack(old => {
         let newCallback = {...old}
-        newCallback.records = []
-        newCallback.status.cod = null
-        newCallback.status.isLoading = false
+        newCallback.status.isLoading = !newCallback.status.isLoading
         return newCallback
       })
-
-      setQuery(oldQuery => {
-        let newQuery = {...oldQuery}
-        newQuery.str = {} 
-        newQuery.type = ''
-        return newQuery
-      })
     }
-  }, [callback.status.cod])
+  }, [callback.records])
+
+  const updateFields = cb => {
+    let formArr = Array.from(document.querySelectorAll('#formInputs, inputs'));
+    console.group('UpdateForm')
+    console.log('Forma', [...formArr[0].childNodes])
+
+    for (let prop in cb.records[0]){
+      formik.setFieldValue(prop, cb.records[0][prop])
+    }
+    return cb.records[0]
+  }
   
   // Обновить поля формы
   const _InitFormik = arrCol => {
@@ -97,7 +107,9 @@ const ExcelFormik = () => {
             formik.setFieldValue('isBtn', e.target.name)
             formik.handleSubmit(e);
           }}>Поиск</button> 
-          { renderInputs(excelTable) }
+        <div id="formInputs">
+        { renderInputs(excelTable) }
+        </div>
         </div>
         <div>
           <button name="addBtn" className="btn-1-mod" type="submit" onClick={(e)=>{

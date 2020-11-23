@@ -1,176 +1,236 @@
 import React, { useEffect, useState } from 'react'
-import Context from '../../utils/context/Context'
+import Contexts from '../../utils/context/Context'
 import { ReactExcel, readFile, generateObjects } from '@ramonak/react-excel';
 import XLSX from 'xlsx';
 import ExcelFormik from '../forms/excelformik'
 
 const Excel = () => {
-    const [initialData, setInitialData] = useState() // При загрузке таблицы получаем начальные данные
-    const [currentSheet, setCurrentSheet] = useState({}) // Храним текущее состояние таблицы
-    const [excelTable, setExcelTable] = useState({
-      name: "",
-      columns: []
-    }); // Храним основные данные о таблице (название текущего листа, заголовки)
-    const [JSONTable, setJSONTable] = useState({}) // Храним текущее состояние таблицы в формате json
-    const [isForm, setIsForm] = useState(false); // Открытие формы (только если загружена таблица)
-    const [query, setQuery] = useState({
-      type: "", // isBtn -> searchBtn, addBtn, changeBtn, removeBtn
-      str: {} // JSON query string
-    }) // Строка для поиска/записи/изменения
-    const [callback, setCallBack] = useState(
-      {
-        records: [], // JSON back string
-        status: {
-          cod: "", // fetch status cod
-          isLoading: false, //
-        }
-      }
-    )
-
-    // Функция для чтения файла с таблицей .xlsx
-    const handleUpload = event => { 
-      console.log('Read input excel file...')
-      const file = event.target.files[0];
-      readFile(file)
-        .then((readedData) => {
-          setInitialData(readedData);
-        })
-        .catch(error => { console.log('Error when read input excel file!', error)});
-    }
-
-    // Открытие формы
-    const openForm = () => { if (initialData) setIsForm(!isForm); }
-
-    // Проверка объекта
-    const checkObj = obj => {
-      if (Object.keys(obj).length !== 0 && obj.constructor === Object) {
-        return true
-      } else {
-        return false
+  const [initialData, setInitialData] = useState() // При загрузке таблицы получаем начальные данные
+  const [currentSheet, setCurrentSheet] = useState({}) // Храним текущее состояние таблицы
+  const [excelTable, setExcelTable] = useState({
+    name: "",
+    columns: []
+  }); // Храним основные данные о таблице (название текущего листа, заголовки)
+  const [JSONTable, setJSONTable] = useState({}) // Храним текущее состояние таблицы в формате json
+  const [isForm, setIsForm] = useState(false); // Открытие формы (только если загружена таблица)
+  const [query, setQuery] = useState({
+    type: "", // isBtn -> searchBtn, addBtn, changeBtn, removeBtn
+    str: {} // JSON query string
+  }) // Строка для поиска/записи/изменения
+  const [callback, setCallBack] = useState(
+    {
+      records: {},
+      status: {
+        cod: "", // fetch status cod
+        isLoading: false, //
       }
     }
+  )
 
-    // Проверка массива
-    const checkArr = arr => {
-      if (arr.length !== 0 && arr.constructor === Array){
-        return true
-      } else {
-        return false
-      }
-    }
-
-    // Функция сохраниения данных в формат JSON
-    const SaveToJson = (curSheet, tableName) => { 
-      if (checkObj(curSheet)) {
-        console.group('...SaveToJson...')
-        console.log('CurrentSheet (SaveToJson): ', curSheet)
-        setCurrentSheet(curSheet) // Запоминаем текущее состояние таблицы
-        const result = generateObjects(curSheet) // создаем объект JSON из файла .xlsx
-        setJSONTable(result) // записываем текущее состояние как JSON
-        console.log('Table name (SaveToJson)', tableName)
-        let bufferObj = {[tableName]: result} // Задать путь в файле JSON как название таблицы
-  
-        var headers = new Headers(); // Устанавливаем заголовки для запроса
-        headers.append('Content-Type', 'application/json')
-        var options = {
-          method: 'POST',
-          headers: headers,
-          mode: 'cors',
-          cache: 'default',
-          body:  JSON.stringify(bufferObj)
-        }
-  
-        var request = new Request('http://localhost:8081/table', options) // Обновить JSON POST-запросом
-        fetch(request)
-          .then(response => {
-            console.log("Success");
-            return response; })
-          .then( json => { console.log('JSON error', json.errors); })
-          .catch( err => { console.log('Ошибки JSON', err); })
-      }
-    }
-
-    const saveBtn = () => {
-      if (typeof JSONTable !== "undefined"){
-        console.group('...SaveBtn...')
-        console.log('JSONTable (saveBtn)', JSONTable)
-        console.log('Current Sheet (saveBtn)', currentSheet)
-        const result = generateObjects(currentSheet) // создаем объект JSON из объекта массива
-        
-        let newWB = XLSX.utils.book_new()
-        let newWS = XLSX.utils.json_to_sheet(result)
-        XLSX.utils.book_append_sheet(newWB, newWS, excelTable.name)
-        XLSX.writeFile(newWB, "data.xlsx")
-        SaveToJson(currentSheet, excelTable.name)
-      }
-    }
-
-// **************************************** JSONtoCurrentSheetObject **********************************************
-    const JSONtoCurSheet = jsonTable => {
-      let arrOfValues = []
-      let arrOfKeys = []
-      jsonTable.forEach(item => {
-        arrOfValues.push(Object.values(item))
-        arrOfKeys.push(Object.keys(item))
+  // Функция для чтения файла с таблицей .xlsx
+  const handleUpload = event => { 
+    console.log('Read input excel file...')
+    const file = event.target.files[0];
+    readFile(file)
+      .then((readedData) => {
+        setInitialData(readedData);
       })
-      const newSheet = [arrOfKeys].concat(arrOfValues) 
-      console.log('Array (generateObject)', newSheet);
-      return newSheet
+      .catch(error => { console.log('Error when read input excel file!', error)});
+  }
+
+  // Открытие формы
+  const openForm = () => { if (initialData) setIsForm(!isForm); }
+
+  // Проверка объекта
+  const checkObj = obj => {
+    return (Object.keys(obj).length !== 0 && obj.constructor === Object)? true: false
+  }
+
+  // Проверка массива
+  const checkArr = arr => {
+    return (arr.length !== 0 && arr.constructor === Array)? true: false;
+  }
+
+  // Функция сохраниения данных в формат JSON
+  const SaveToJson = (curSheet, tableName) => { 
+    if (checkObj(curSheet)) {
+      console.group('...SaveToJson...')
+      console.log('CurrentSheet (SaveToJson): ', curSheet)
+      setCurrentSheet(curSheet) // Запоминаем текущее состояние таблицы
+      const result = generateObjects(curSheet) // создаем объект JSON из файла .xlsx
+      setJSONTable(result) // записываем текущее состояние как JSON
+      console.log('Table name (SaveToJson)', tableName)
+      let bufferObj = {[tableName]: result} // Задать путь в файле JSON как название таблицы
+      POSTJSON('http://localhost:8081/table', bufferObj)
     }
-// ***************************************************************************************************
+  }
+
+  const saveBtn = () => {
+    if (typeof JSONTable !== "undefined"){
+      console.group('...SaveBtn...')
+      console.log('JSONTable (saveBtn)', JSONTable)
+      console.log('Current Sheet (saveBtn)', currentSheet)
+      const result = generateObjects(currentSheet) // создаем объект JSON из объекта массива
+      
+      let newWB = XLSX.utils.book_new()
+      let newWS = XLSX.utils.json_to_sheet(result)
+      XLSX.utils.book_append_sheet(newWB, newWS, excelTable.name)
+      XLSX.writeFile(newWB, "data.xlsx")
+      SaveToJson(currentSheet, excelTable.name)
+    }
+  }
 
   // ********************************** Search Object WHERE **********************************
-  const JSONSearchByGroup = async (table, query) => {
+  const JSONSearchByGroup = (table, query) => {
     console.group('...JSONSearch by group...')
     const url = 'http://localhost:8081/table';
     let records = []
+    let indexes = []
     let groupSearch = []
 
     console.log('Table', table)
     console.log('query', query)
 
-    setCallBack(old => {
-      let newCallback = {...old}
+    setCallBack(old => { let newCallback = {...old}
       newCallback.status.isLoading = !newCallback.status.isLoading
       return newCallback
     })
-
-    await fetch(url)
-      .then(response => response.json()
-      .then(data => ({
-          data: data,
-          status: response.status
-      }))
-      .catch(err => console.log(err))
-      .then(res => {
-        if (res.data.hasOwnProperty(table.name)){
-          for (let prop in query){
-            if (query[prop] !== "")
+    
+    fetch(url)
+      .then(async response => {
+        const data = await response.json()
+        if (!response.ok) {
+          // get error message from body or default to response statusText
+          const error = (data && data.message) || response.statusText;
+          return Promise.reject(error);
+        }
+        console.log('STATUS', response.status)
+        if (data.hasOwnProperty(table.name)){
+          for (let prop in query.str){ // Поля не с пустыми значениями в запросе 
+            if (query.str[prop] !== "")
               groupSearch.push(prop)
           }
-          records = res.data[table.name].filter((item, idx) => {
-            for (let key of groupSearch) {
-              if (item[key] === undefined || item[key].toLowerCase() != query[key].toLowerCase())
+          records = data[table.name].filter((item, idx) => {
+            for (let key of groupSearch)
+              if (item[key] === undefined || item[key].toLowerCase() != query.str[key].toLowerCase()) {
                 return false;
             }
+            indexes.push(idx)
             return true;
           });
-          setCallBack(old => {
-            let newCallback = {...old}
-            newCallback.records.splice(0, newCallback.records.length,  {...records})
-            newCallback.status.cod = res.status
+          records.forEach((item, index) => {
+            item['ID'] = indexes[index]
+          })
+
+          setCallBack(old => { let newCallback = {...old}
+            newCallback.records = [...records]
+            newCallback.status.cod = response.status
             return newCallback
-          })
-          setQuery(old => {
-            let newQuery = {...old}
-            newQuery.str = {}
-            return newQuery
-          })
+          }) 
+
+          console.group('...TYPE OF QUERY...') 
+          console.log('...', records) 
+          switch(query.type){
+            case 'searchBtn':
+              console.group('...SEARCH...') 
+              break;
+            case 'addBtn':
+              if (!records.length)
+                tableAddItem(query.str, currentSheet, excelTable)
+              break;
+            case 'removeBtn':
+              if (records.length)
+                tableDeleteItem(records[0]['ID'], currentSheet, excelTable)
+              break;
+            case 'changeBtn':
+              console.log('CHANGE BTN', callback.records[0]['ID'])
+              console.log('CHANGE BTN', query.str)
+              console.log('CHANGE BTN', currentSheet[excelTable.name])
+              tableChangeItem(callback.records[0]['ID'], query.str, currentSheet, excelTable)
+              break;
+          }
         }
-      }))
-    return records
+      });
+     return records
+  }
+
+  const tableDeleteItem = (id, cs, table) => {
+    console.group('...REMOVE...') 
+    let newArr = cs[table.name].slice()
+    let oldItem = newArr.splice(id + 1, 1)
+    cs[table.name] = newArr.slice()
+
+    console.log('CURSHET', cs)
+    setCurrentSheet(oldObj => {
+      let newObj = {...oldObj}
+      newObj = {...cs}
+      SaveToJson(cs, excelTable.name)
+      return newObj
+    })
+    setCurrentSheet(cs)
+  }
+
+  const tableAddItem = (query, cs, table) => {
+    let newString = []
+    for (let prop of table.columns){
+      if (query.hasOwnProperty(prop)){
+        if (query[prop] !== ""){
+          newString.push(query[prop])
+        }
+      } else {
+        newString.push("")
+      }
+    }
+    console.log('newString', newString)
+    console.log('currentSheet', currentSheet) 
+    cs[table.name].push(newString)
+    setCurrentSheet(cs)
+    SaveToJson(cs, excelTable.name)
+  }
+
+  const tableChangeItem = (id, newItem, cs, table) => {
+    console.group('...CHANGE...',newItem) 
+    let newString = []
+    for (let prop of table.columns){
+      if (newItem.hasOwnProperty(prop)){
+          newString.push(newItem[prop])
+      } else {
+        newString.push("")
+      }
+    }
+
+    cs[table.name].splice(id + 1, 1, newString)
+    setCurrentSheet(cs)
+    SaveToJson(cs, excelTable.name)
   }
   // ********************************************************************
+
+  const POSTJSON = async (url, json) => {
+    console.group('...POST to db.json...')
+
+    const requestOptions = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(json)
+    };
+
+    fetch(url, requestOptions)
+        .then(async response => {
+            const data = await response.json();
+            // check for error response
+            if (!response.ok) {
+                // get error message from body or default to response status
+                const error = (data && data.message) || response.status;
+                return Promise.reject(error);
+            }    
+            console.log('POSTED!')
+        })
+        .catch(error => {
+            this.setState({ errorMessage: error.toString() });
+            console.error('There was an error!', error);
+        });
+  }
+  
 
   // Если изменилась строка запроса, то ...
   useEffect (() => {
@@ -182,24 +242,13 @@ const Excel = () => {
 
   // Запрос в таблицу
   const QueryLocalTable = query => {
-      switch (query.type){
-        case 'searchBtn':
-          let GroupSearch = []
-          for (let prop in query.str){
-            GroupSearch.push(prop)
-            var searchField = prop
-          }
-          if (!searchField)
-            alert(`Введите значение по которому искать!`)
-          else
-            console.log(GroupSearch);
-            let recd = JSONSearchByGroup(excelTable, query.str)
-            console.log('Search example', recd)
-          break;
-        case 'addBtn':
-            console.log('Add')
-          break;  
-      }   
+    if (!checkObj(query.str)){
+      alert(`Введите значение по которому искать!`) 
+    }
+    else
+    {
+      JSONSearchByGroup(excelTable, query)
+    }
   }
 
   // Изменение имени таблицы, заголовков
@@ -219,7 +268,7 @@ const Excel = () => {
   };
     
     return (
-      <Context.Provider value={{excelTable, query, setQuery, callback, setCallBack}}>
+      <Contexts.Provider value={{excelTable, query, setQuery, callback, setCallBack}}>
         <>
         <div style={{display: "flex"}}>
           <input
@@ -241,15 +290,15 @@ const Excel = () => {
           <ReactExcel
             initialData={initialData}
             onSheetUpdate={(curSheet) => {
-              console.log('CURRENT SHEET UPDATE', curSheet);
-              let {tableName} = changeInfoTable(curSheet);
-              SaveToJson(curSheet, tableName);
+              console.log('CURRENT SHEET UPDATE', curSheet)
+              let {tableName} = changeInfoTable(curSheet)
+              SaveToJson(curSheet, tableName)
             }}
             activeSheetClassName='active-sheet'
             reactExcelClassName='react-excel'
           />
         </>
-      </Context.Provider>
+      </Contexts.Provider>
     );
   }
 
