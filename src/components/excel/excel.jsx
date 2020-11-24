@@ -3,6 +3,7 @@ import Contexts from '../../utils/context/Context'
 import { ReactExcel, readFile, generateObjects } from '@ramonak/react-excel';
 import XLSX from 'xlsx';
 import ExcelFormik from '../forms/excelformik'
+import Check from '../../utils/check/check'
 
 const Excel = () => {
   const [initialData, setInitialData] = useState() // При загрузке таблицы получаем начальные данные
@@ -17,15 +18,13 @@ const Excel = () => {
     type: "", // isBtn -> searchBtn, addBtn, changeBtn, removeBtn
     str: {} // JSON query string
   }) // Строка для поиска/записи/изменения
-  const [callback, setCallBack] = useState(
-    {
+  const [callback, setCallBack] = useState({
       records: {},
       status: {
         cod: "", // fetch status cod
         isLoading: false, //
       }
-    }
-  )
+    })
 
   // Функция для чтения файла с таблицей .xlsx
   const handleUpload = event => { 
@@ -41,20 +40,10 @@ const Excel = () => {
   // Открытие формы
   const openForm = () => { if (initialData) setIsForm(!isForm); }
 
-  // Проверка объекта
-  const checkObj = obj => {
-    return (Object.keys(obj).length !== 0 && obj.constructor === Object)? true: false
-  }
-
-  // Проверка массива
-  const checkArr = arr => {
-    return (arr.length !== 0 && arr.constructor === Array)? true: false;
-  }
-
   // Функция сохраниения данных в формат JSON
   const SaveToJson = (curSheet, tableName) => { 
-    if (checkObj(curSheet)) {
-      console.group('...SaveToJson...')
+    if (Check.Obj(curSheet)) {
+      console.log('...SaveToJson...')
       console.log('CurrentSheet (SaveToJson): ', curSheet)
       setCurrentSheet(curSheet) // Запоминаем текущее состояние таблицы
       const result = generateObjects(curSheet) // создаем объект JSON из файла .xlsx
@@ -66,23 +55,26 @@ const Excel = () => {
   }
 
   const saveBtn = () => {
-    if (typeof JSONTable !== "undefined"){
-      console.group('...SaveBtn...')
+    if (Check.Arr(JSONTable)){
+      console.log('...SaveBtn...')
       console.log('JSONTable (saveBtn)', JSONTable)
       console.log('Current Sheet (saveBtn)', currentSheet)
       const result = generateObjects(currentSheet) // создаем объект JSON из объекта массива
-      
-      let newWB = XLSX.utils.book_new()
-      let newWS = XLSX.utils.json_to_sheet(result)
-      XLSX.utils.book_append_sheet(newWB, newWS, excelTable.name)
-      XLSX.writeFile(newWB, "data.xlsx")
-      SaveToJson(currentSheet, excelTable.name)
+      try {
+        let newWB = XLSX.utils.book_new()
+        let newWS = XLSX.utils.json_to_sheet(result)
+        XLSX.utils.book_append_sheet(newWB, newWS, excelTable.name)
+        XLSX.writeFile(newWB, "data.xlsx")
+        SaveToJson(currentSheet, excelTable.name)
+      } catch(e) {
+        console.log('Error', e)
+      }
     }
   }
 
   // ********************************** Search Object WHERE **********************************
   const JSONSearchByGroup = (table, query) => {
-    console.group('...JSONSearch by group...')
+    console.log('...JSONSearch by group...')
     const url = 'http://localhost:8081/table';
     let records = []
     let indexes = []
@@ -128,11 +120,11 @@ const Excel = () => {
             return newCallback
           }) 
 
-          console.group('...TYPE OF QUERY...') 
+          console.log('...TYPE OF QUERY...') 
           console.log('...', records) 
           switch(query.type){
             case 'searchBtn':
-              console.group('...SEARCH...') 
+              console.log('...SEARCH...') 
               break;
             case 'addBtn':
               if (!records.length)
@@ -155,7 +147,7 @@ const Excel = () => {
   }
 
   const tableDeleteItem = (id, cs, table) => {
-    console.group('...REMOVE...') 
+    console.log('...REMOVE...') 
     let newArr = cs[table.name].slice()
     let oldItem = newArr.splice(id + 1, 1)
     cs[table.name] = newArr.slice()
@@ -189,7 +181,7 @@ const Excel = () => {
   }
 
   const tableChangeItem = (id, newItem, cs, table) => {
-    console.group('...CHANGE...',newItem) 
+    console.log('...CHANGE...',newItem) 
     let newString = []
     for (let prop of table.columns){
       if (newItem.hasOwnProperty(prop)){
@@ -206,7 +198,7 @@ const Excel = () => {
   // ********************************************************************
 
   const POSTJSON = async (url, json) => {
-    console.group('...POST to db.json...')
+    console.log('...POST to db.json...')
 
     const requestOptions = {
       method: 'POST',
@@ -231,10 +223,9 @@ const Excel = () => {
         });
   }
   
-
   // Если изменилась строка запроса, то ...
   useEffect (() => {
-    if (checkArr(JSONTable)) { 
+    if (Check.Arr(JSONTable)) { 
       console.log('Incoming Query', query)
       QueryLocalTable(query);
     }
@@ -242,7 +233,7 @@ const Excel = () => {
 
   // Запрос в таблицу
   const QueryLocalTable = query => {
-    if (!checkObj(query.str)){
+    if (!Check.Obj(query.str)){
       alert(`Введите значение по которому искать!`) 
     }
     else
@@ -253,7 +244,7 @@ const Excel = () => {
 
   // Изменение имени таблицы, заголовков
   const changeInfoTable = cs => { 
-    console.group('...changeInfoTable...')
+    console.log('...changeInfoTable...')
     let tableName = Object.keys(cs)[0].toString();
     let tableHeads = cs[tableName][0];
     console.log('Current Table Name', tableName)
@@ -270,7 +261,7 @@ const Excel = () => {
     return (
       <Contexts.Provider value={{excelTable, query, setQuery, callback, setCallBack}}>
         <>
-        <div style={{display: "flex"}}>
+        <div style={{display: "flex", flexDirection: "row"}}>
           <input
             className="btn-1-mod btn-1-yellow"
             type='file'

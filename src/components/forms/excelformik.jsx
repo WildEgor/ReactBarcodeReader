@@ -10,7 +10,7 @@ const ExcelFormik = () => {
     onSubmit: values => {
       let isBtn = values.isBtn
       delete values.isBtn
-      console.group('Do query with ... (onSubmit)', values)
+      console.log('Do query with ... (onSubmit)', values)
       if (isBtn == 'resetBtn'){
         console.log('Reset form... (onSubmit)')
         ResetForm()
@@ -29,7 +29,7 @@ const ExcelFormik = () => {
 
   const ResetForm = () => {
     let formArr = [...Array.from(document.querySelectorAll('#formInputs, inputs'))[0].childNodes];
-    console.group('ResetForm')
+    console.log('ResetForm')
     console.log('Forma', formArr)
     formArr.forEach(item => {
       item.value = ""
@@ -49,7 +49,7 @@ const ExcelFormik = () => {
   // Обработка callback
   useEffect(() => {
     if (callback.status.isLoading){
-      console.group('...Callback...')
+      console.log('...Callback...')
       console.log('Records is ', callback.records)
       if (callback.records.length){
         updateFields(callback)
@@ -66,7 +66,7 @@ const ExcelFormik = () => {
 
   const updateFields = cb => {
     let formArr = Array.from(document.querySelectorAll('#formInputs, inputs'));
-    console.group('UpdateForm')
+    console.log('UpdateForm')
     console.log('Forma', [...formArr[0].childNodes])
 
     for (let prop in cb.records[0]){
