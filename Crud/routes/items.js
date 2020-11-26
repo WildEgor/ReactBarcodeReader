@@ -24,7 +24,7 @@ router.get('/:id', async (req, res) => {
     const student = await Items.findById(req.params.id);
     res.send({ student });
   } catch (err) {
-    res.status(404).send({ message: 'Student not found!' });
+    res.status(404).send({ message: 'Товар не найден!' });
   }
 });
 
@@ -33,7 +33,13 @@ router.get('/:id', async (req, res) => {
 // @access  Public
 router.post('/', async (req, res) => {
   try {
-      const newStudent = await Items.create({ articul: req.body.articul, desc: req.body.desc,  countAll: req.body.countAll, sold: req.body.sold, remind: req.body.remind, notes: req.body.notes });
+      const newStudent = await Items.create(
+        { articul: req.body.articul, 
+          desc: req.body.desc,  
+          countAll: req.body.countAll, 
+          sold: req.body.sold, 
+          remind: req.body.remind, 
+          notes: req.body.notes });
      res.send({ newStudent });
   } catch(err) {
     res.status(400).send({ error: err });
@@ -47,7 +53,7 @@ router.post('/', async (req, res) => {
 router.put('/:id', async (req, res) => {
   try {
     const updatedStudent = await Items.findByIdAndUpdate(req.params.id, req.body);
-     res.send({ message: 'The student was updated' });
+     res.send({ message: 'Товар был обновлен' });
   } catch(err) {
     res.status(400).send({ error: err });
   }
@@ -59,7 +65,7 @@ router.put('/:id', async (req, res) => {
 router.delete('/:id', async (req, res) => {
   try {
     const removeStudent = await Items.findByIdAndRemove(req.params.id);
-     res.send({ message: 'The student was removed' });
+     res.send({ message: 'Товар был удален' });
   } catch(err) {
     res.status(400).send({ error: err });
   }

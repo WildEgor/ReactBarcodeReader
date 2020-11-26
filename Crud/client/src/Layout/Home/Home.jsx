@@ -5,9 +5,12 @@ import { PropagateLoader } from 'react-spinners';
 // Components
 import Student from "../../components/Student/Student";
 import SearchStudents from "../../components/SearchStudent/SearchStudents";
+import Scanner from '../../components/Scanner/Scanner'
+import GlobalContext from '../../Context/GlobalContext';
 
 class Home extends Component {
   state = {
+    barcode: "",
     data: null,
     allStudents: null,
     error: ""
@@ -15,11 +18,17 @@ class Home extends Component {
 
   async componentDidMount() {
     try {
+      console.log('First search!')
       const students = await axios("/api/items/");
       this.setState({ data: students.data });
     } catch (err) {
       this.setState({ error: err.message });
     }
+  }
+
+  getBarcode = barCode => {
+    console.log('Result', barCode.codeResult.code)
+    this.setState({barcode: barCode.codeResult.code})
   }
 
   removeStudent = async id => {
@@ -59,12 +68,22 @@ class Home extends Component {
     if (this.state.error) return <h1>{this.state.error}</h1>;
     if (this.state.data !== null)
       if (!this.state.data.students.length)
-        return <h1 className="No-Students">No students!</h1>;
+        return <h1 className="No-Students">No items!</h1>;
 
     return (
       <div className="Table-Wrapper">
+      <GlobalContext.Consumer>
+      {({isToggle}) => {
+        if (isToggle){
+          console.log(isToggle)
+          return (
+            <Scanner onDetected={this.getBarcode} />
+          )
+        }
+      }}
+      </GlobalContext.Consumer>
         <h1>Товар на складе:</h1>
-        <SearchStudents searchStudents={this.searchStudents} />
+        <SearchStudents searchStudents={this.searchStudents} scannerSearch={this.state.barcode} />
         <table className="Table">
           <thead>
             <tr>

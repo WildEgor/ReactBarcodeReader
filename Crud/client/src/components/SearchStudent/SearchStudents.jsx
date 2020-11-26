@@ -1,26 +1,40 @@
-import React, { Component } from "react";
+import React, {Fragment, useState, useEffect } from "react";
 import "./SearchStudents.css";
 
-class SearchStudents extends Component {
-  state = { value: "" };
+const SearchStudents = props => {
+  const [value, setValue] = useState("")
 
-  onChangeHandler = e => {
-    this.setState({ value: e.target.value }, () => {
-      this.props.searchStudents(this.state.value);
-    });
+  const handleChange = e => {
+    console.log(e.target.value)
+    setValue(e.target.value)
+    letSearch(e.target.value)
   }
 
-  render() {
-    return (
-      <input
-        type="text"
-        placeholder="Поиск по артикулу..."
-        name="articul"
-        onChange={ this.onChangeHandler }
-        className="Search-Student-Input"
-      />
-    );
+  useEffect(() => {
+    console.log('Its me, scanner!', props.scannerSearch);
+    setValue(props.scannerSearch)
+    letSearch(props.scannerSearch)
+  }, [props.scannerSearch])
+
+  const letSearch = query => {
+    if (value !== query){
+      setValue(query)
+      props.searchStudents(query)
+    }
   }
+
+  return (
+    <Fragment>
+    <input
+      value={value}
+      type="text"
+      placeholder="Поиск по артикулу..."
+      name="articul"
+      onChange={ handleChange }
+      className="Search-Student-Input"
+    />
+    </Fragment>
+  );
 }
 
 export default SearchStudents;

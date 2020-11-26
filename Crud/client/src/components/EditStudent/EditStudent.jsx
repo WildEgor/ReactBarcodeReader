@@ -19,6 +19,7 @@ class EditStudent extends Component {
   onChangeHandler = e => this.setState({ [e.target.name]: e.target.value });
 
   async componentDidMount() {
+    console.log('First Scan!')
     try {
     let search =  this.props.location.search,
       id = search.substring(1, search.length);
@@ -66,24 +67,27 @@ class EditStudent extends Component {
             className="Edit-Student-Input"
             id="articul"
           />
-          <label htmlFor="desc">Краткое описание:</label>
-          <input
-            type="text"
+          <label htmlFor="desc" style={{display: "flex", flexDirection: "column"}}>Краткое описание:
+          <textarea
+            style={{resize: "vertical"}}
             placeholder="Описание товара..."
             value={ this.state.desc }
             name="desc"
             onChange={this.onChangeHandler}
             required
+            minLength="3"
+            maxLength="255"
             className="Edit-Student-Input"
             id="desc"
           />
+          </label>
           <label htmlFor="countAll">Всего на складе: </label>
           <input
             type="number"
-            placeholder="1 до 120"
+            placeholder="0 до 120"
             value={ this.state.countAll }
             name="countAll"
-            min="1"
+            min="0"
             max="120"
             required
             onChange={this.onChangeHandler}
@@ -93,10 +97,10 @@ class EditStudent extends Component {
           <label htmlFor="sold">Продано: </label>
           <input
             type="number"
-            placeholder="1 до 120"
+            placeholder="0 до 120"
             value={ this.state.sold }
             name="sold"
-            min="1"
+            min="0"
             max="120"
             required
             onChange={this.onChangeHandler}
@@ -106,19 +110,19 @@ class EditStudent extends Component {
           <label htmlFor="remind">Остаток: </label>
           <input
             type="number"
-            placeholder="1 до 120"
+            placeholder="0 до 120"
             value={ this.state.remind }
             name="remind"
-            min="1"
+            min="0"
             max="120"
             required
             onChange={this.onChangeHandler}
             className="Edit-Student-Input"
             id="remind"
           />
-          <label htmlFor="notes">Примечание:</label>
-          <input
-            type="text"
+          <label htmlFor="notes" style={{display: "flex", flexDirection: "column"}}>Примечание:
+          <textarea
+            style={{resize: "vertical"}}
             placeholder="Примечание к товару..."
             value={ this.state.notes }
             name="notes"
@@ -127,6 +131,7 @@ class EditStudent extends Component {
             className="Edit-Student-Input"
             id="notes"
           />
+          </label>
           <button type="submit" className="Edit-Student-Submit fa fa-pencil"></button>
         </form>
         <ToastContainer />
