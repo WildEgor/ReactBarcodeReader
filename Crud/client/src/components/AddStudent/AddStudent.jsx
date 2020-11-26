@@ -21,7 +21,7 @@ class AddStudent extends Component {
     e.preventDefault();
     try {
       const allStudents = await axios("/api/items/")
-      console.log('All Students is ', allStudents.data)s
+      console.log('All Students is ', allStudents.data)
 
       let myItem = allStudents.data.students.filter(item => {
         if (item.articul.toLowerCase() !== this.state.articul.toLowerCase()){
