@@ -13,8 +13,12 @@
   color: #fff;
 }
 
+.Table-Search {
+  display: flex;
+}
+
 thead {
-  background-color: #9b9b9b;
+  background-color: #6200ea;
   border-radius: 100px;
 }
 
@@ -27,6 +31,12 @@ tr:nth-child(even) {
 }
 
 th {
+  border-right-style: solid;
+  border-right-width: 1px;
+  border-left-style: solid;
+  border-left-width: 1px;
+  border-bottom-style: solid;
+  border-bottom-width: 1px;
   font-weight: bold;
   font-size: 18px;
   padding: 1rem;
@@ -40,7 +50,17 @@ th:last-child {
   border-top-right-radius: 10px;
 }
 
+tbody tr td:first-child{
+  font-weight: 600;
+}
+
 td {
+  border-right-style: solid;
+  border-right-width: 1px;
+  border-left-style: solid;
+  border-left-width: 1px;
+  border-bottom-style: solid;
+  border-bottom-width: 1px;
   font-size: 15px;
   font-weight: lighter;
   padding: 1rem;
@@ -59,4 +79,11 @@ td {
   justify-content: center; 
   height: 100vh;
   align-items: center;
+}
+
+.Add-Button{
+  display: flex;
+  padding: 0px;
+  color: #fff;
+  transition: .7s color ease;
 }

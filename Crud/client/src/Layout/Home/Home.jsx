@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { Link } from 'react-router-dom';
 import "./Home.css";
 import axios from "axios";
 import { PropagateLoader } from 'react-spinners';
@@ -8,12 +9,26 @@ import SearchStudents from "../../components/SearchStudent/SearchStudents";
 import Scanner from '../../components/Scanner/Scanner'
 import GlobalContext from '../../Context/GlobalContext';
 
+import Button from '@material-ui/core/Button';
+import CreateIcon from '@material-ui/icons/Create';
+import { makeStyles } from '@material-ui/core/styles';
+
+const useStyles = makeStyles((theme) => ({
+  button: {
+    margin: theme.spacing(1),
+    '&:hover': {
+      backgroundColor: "green",
+  }
+  },
+}));
+
 class Home extends Component {
   state = {
     barcode: "",
     data: null,
     allStudents: null,
-    error: ""
+    error: "",
+    isFound: true
   };
 
   async componentDidMount() {
@@ -32,6 +47,7 @@ class Home extends Component {
   }
 
   removeStudent = async id => {
+    console.log('Try delete...')
     try {
       const studentRemoved = await axios.delete(`/api/items/${id}`);
       const students = await axios("/api/items/");
@@ -48,11 +64,23 @@ class Home extends Component {
     let students = this.state.data.students.filter(({ articul }) =>
       articul.toLowerCase().includes(username.toLowerCase())
     );
-    if (students.length > 0) this.setState({ data: { students } });
+
+    console.log(students.length)
+    if (students.length > 0) {
+      this.setState({isFound: true})
+      this.setState({ data: { students } });
+    } else {
+      this.setState({isFound: false})
+    }
 
     if (username.trim() === "")
       this.setState({ data: { students: this.state.allStudents } });
   };
+
+  setIsFound = (isfound = false) => {
+    console.log('isfound', isfound)
+    this.setState({ isFound : isfound })
+  }
 
   render() {
     let students;
@@ -83,7 +111,22 @@ class Home extends Component {
       }}
       </GlobalContext.Consumer>
         <h1>Товар на складе:</h1>
-        <SearchStudents searchStudents={this.searchStudents} scannerSearch={this.state.barcode} />
+        <div className="Table-Search">
+          <SearchStudents searchStudents={this.searchStudents} scannerSearch={this.state.barcode}/>
+          {(!this.state.isFound)? 
+          <Link to="/add" className="Add-Button">
+            <Button
+              variant="contained"
+              color="primary"
+              size="small"
+              className="button"
+              startIcon={<CreateIcon />}
+            >
+            Добавить
+            </Button>
+          </Link>
+          :null }
+        </div>
         <table className="Table">
           <thead>
             <tr>

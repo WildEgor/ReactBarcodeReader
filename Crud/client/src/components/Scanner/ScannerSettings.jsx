@@ -49,7 +49,7 @@ const ScannerSettings = props => {
         <label>
         <span>Типы штрихкодов</span>
             <Select
-            defaultValue={[settings.optionsFuncCode[0], settings.optionsFuncCode[1]]}
+            defaultValue={[...settings.optionsFuncCode]}
             isMulti
             name="funcCode"
             options={settings.optionsFuncCode}
@@ -62,7 +62,7 @@ const ScannerSettings = props => {
         <span>Размеры штрихкодов</span>
             <Select 
             name="patchSize" 
-            defaultValue={settings.optionsPatchSize[0]}  
+            defaultValue={settings.optionsPatchSize[2]}  
             options={settings.optionsPatchSize} 
             onChange={handleChange} 
             />

@@ -17,9 +17,11 @@ const SearchStudents = props => {
   }, [props.scannerSearch])
 
   const letSearch = query => {
+    console.log('Search...')
     if (value !== query){
       setValue(query)
       props.searchStudents(query)
+      console.log('value', query)
     }
   }
 

@@ -5,17 +5,54 @@
   flex-direction: column;
 }
 
+.Add-Student-Form {
+  margin-top: 35px;
+}
+
+.Add-Student-Form textarea {
+  resize: none;
+  height: 8rem;
+}
+
+.Add-Student-Form button.fa-search {
+  background-color: #ff6600;
+}
+
+.Add-Student-Form label {
+  display: flex;
+  flex-direction: column;
+  padding: 5px;
+}
+
+.Add-Student-Form label h4 {
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.Add-Student-Form-Buttons {
+  display: flex;
+  justify-content: center;
+  margin-top: 15px;
+}
+
 .Add-Student-Input {
-  padding: 4px 11px;
-  width: 55vw;
-  height: 32px;
+  margin: 0 auto;
+  padding: 5px;
+  width: 60vw;
+  height: 48px;
   font-size: 14px;
   line-height: 1.5;
   color: rgba(0,0,0,.65);
   background-color: #fff;
   border: 1px solid #d9d9d9;
-  border-radius: 4px;
+  border-radius: 10px;
   outline: none;
+}
+
+.Add-Student-Input-Search{
+  display: flex;
+  align-items: center;
+  margin-left: 50px;
 }
 
 .Add-Student-Submit, .Add-Student-Reset {
@@ -38,5 +75,6 @@
 }
 
 label {
+  
   padding-left: 2%;
 }

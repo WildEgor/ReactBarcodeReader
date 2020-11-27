@@ -11,18 +11,18 @@ const Scanner = props => {
           type : "LiveStream",
           //target: document.getElementById('myScanner'),  
           constraints: {
-            width: 1024,
+            width: 1920,
             height: 200,
             facingMode: 'enviroment', // or user
           },
         },
         locator: {
-          patchSize: 'x-small',
+          patchSize: 'medium',
           halfSample: false,
         },
         numOfWorkers: 2,
         decoder: {
-          readers: ['code_128_reader', 'code_39_reader'],
+          readers: ['code_128_reader', 'code_39_reader', 'upc_reader', 'ean_reader'],
         },
         locate: true,
         frequency: 1
@@ -98,14 +98,20 @@ const Scanner = props => {
             }
             return newConf
         })
-        Quagga.stop()
-        _UpdateScanner()
+        try{
+            Quagga.stop()
+            _UpdateScanner()
+        } catch(err) {
+            console.log(err)
+        }
     }
 
     useEffect(() => {
-        Quagga.onDetected(_onDetected)
-        Quagga.onProcessed(_onProcessed)
-        return () => { Quagga.offDetected(_onDetected) }
+            Quagga.onDetected(_onDetected)
+            Quagga.onProcessed(_onProcessed)
+        return () => { 
+            Quagga.offDetected(_onDetected) 
+        }
     })
 
     useEffect(() => {

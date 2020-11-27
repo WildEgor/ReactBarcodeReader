@@ -7,13 +7,20 @@
   color: #fff;
 }
 
+.NavBar-Links {
+  display: flex;
+  justify-content: center;
+}
+
 .NavBar-Title {
   font-weight: lighter;
   padding-left: 1rem;
 }
 
 .NavBar-Link {
-  padding: .8rem;
+  display: flex;
+  align-items: center;
+  padding: .5rem;
   color: #fff;
   transition: .7s color ease;
 }
