@@ -28,12 +28,10 @@ export default function RemoveDialog(props) {
 
   const handleClose = e => {
     let answer = e.target.textContent.toString()
-    console.log('Remove', answer == "Yes")
-    /*
-    if (answer.localeCompare("Да") === 0){
+    if (answer.localeCompare("Да")? false: true){
         props.onRemove(props.item._id)
         console.log('Remove')
-    }*/
+    }
     setOpen(false);
   };
 
@@ -62,8 +60,8 @@ export default function RemoveDialog(props) {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button name="No" onClick={handleClose} color="primary" > No </Button>
-          <Button name="Yes" onClick={handleClose} color="primary" autoFocus> Yes </Button>
+          <Button name="No" onClick={handleClose} color="primary">Нет</Button>
+          <Button name="Yes" onClick={handleClose} color="primary" autoFocus>Да</Button>
         </DialogActions>
       </Dialog>
     </div>

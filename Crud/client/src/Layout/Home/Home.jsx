@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import { Link } from 'react-router-dom';
 import "./Home.css";
 import axios from "axios";
 import { PropagateLoader } from 'react-spinners';
@@ -9,26 +8,13 @@ import SearchStudents from "../../components/SearchStudent/SearchStudents";
 import Scanner from '../../components/Scanner/Scanner'
 import GlobalContext from '../../Context/GlobalContext';
 
-import Button from '@material-ui/core/Button';
-import CreateIcon from '@material-ui/icons/Create';
-import { makeStyles } from '@material-ui/core/styles';
-
-const useStyles = makeStyles((theme) => ({
-  button: {
-    margin: theme.spacing(1),
-    '&:hover': {
-      backgroundColor: "green",
-  }
-  },
-}));
-
 class Home extends Component {
   state = {
     barcode: "",
     data: null,
     allStudents: null,
     error: "",
-    isFound: true
+    query: ""
   };
 
   async componentDidMount() {
@@ -59,31 +45,30 @@ class Home extends Component {
 
   searchStudents = async username => {
     let allStudents = [...this.state.data.students];
+    let isFound;
     if (this.state.allStudents === null) this.setState({ allStudents });
 
     let students = this.state.data.students.filter(({ articul }) =>
-      articul.toLowerCase().includes(username.toLowerCase())
+      (articul.toLowerCase().includes(username.toLowerCase()) && articul.length === username.length)
     );
 
     console.log(students.length)
     if (students.length > 0) {
-      this.setState({isFound: true})
+      this.setState({ query: username })
+      isFound = true
       this.setState({ data: { students } });
     } else {
-      this.setState({isFound: false})
+      isFound = false
     }
 
     if (username.trim() === "")
       this.setState({ data: { students: this.state.allStudents } });
+  
+    return isFound
   };
 
-  setIsFound = (isfound = false) => {
-    console.log('isfound', isfound)
-    this.setState({ isFound : isfound })
-  }
-
-  render() {
-    let students;
+  render(){
+    let students
 
     if (this.state.data)
       students =
@@ -96,7 +81,7 @@ class Home extends Component {
     if (this.state.error) return <h1>{this.state.error}</h1>;
     if (this.state.data !== null)
       if (!this.state.data.students.length)
-        return <h1 className="No-Students">No items!</h1>;
+        return <h1 className="No-Students">В базе данных отсутствуют записи!</h1>;
 
     return (
       <div className="Table-Wrapper">
@@ -113,19 +98,6 @@ class Home extends Component {
         <h1>Товар на складе:</h1>
         <div className="Table-Search">
           <SearchStudents searchStudents={this.searchStudents} scannerSearch={this.state.barcode}/>
-          {(!this.state.isFound)? 
-          <Link to="/add" className="Add-Button">
-            <Button
-              variant="contained"
-              color="primary"
-              size="small"
-              className="button"
-              startIcon={<CreateIcon />}
-            >
-            Добавить
-            </Button>
-          </Link>
-          :null }
         </div>
         <table className="Table">
           <thead>

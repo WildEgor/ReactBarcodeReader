@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import './AddStudent.css';
 import axios from "axios";
 import {toast, ToastContainer} from 'react-toastify';
@@ -64,7 +64,6 @@ const AddStudent = props => {
           }
         } else {
           notify(value)
-          //toast("Товар уже существует!" ,{ position: "top-left", type: toast.TYPE.ERROR, autoClose: 3000 });
         }
       }
     )
@@ -96,7 +95,6 @@ const AddStudent = props => {
         let isExist = itemsCount ? true : false
         if (isExist) {
           notify(itemList)
-          //toast(`Товар уже существует! Найдено ${itemsCount} запись(-ей).` ,{ type: toast.TYPE.WARNING, autoClose: 3000, position: "top-center" });
         } else {
           toast("Такого товара еще нет на складе!" ,{ type: toast.TYPE.SUCCESS, autoClose: 3000, position: "top-center" });
         }
@@ -121,6 +119,16 @@ const AddStudent = props => {
     }
   }
 
+  useEffect(() => {
+    if (typeof props.location.query !== "undefined"){
+      setInfo(old => {
+        let newObj = {...old}
+        newObj.articul = props.location.query
+        return newObj
+      })
+    }
+  }, [])
+
     return (
       <div className='AddStudent-Wrapper'>
         <h1>Добавить товар:</h1>
@@ -132,6 +140,7 @@ const AddStudent = props => {
             type="text"
             placeholder="Артикул..."
             name="articul"
+            value={info.articul}
             onChange={onChangeHandler}
             className="Add-Student-Input"
             required
