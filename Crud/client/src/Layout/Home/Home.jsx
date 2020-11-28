@@ -99,20 +99,22 @@ class Home extends Component {
         <div className="Table-Search">
           <SearchStudents searchStudents={this.searchStudents} scannerSearch={this.state.barcode}/>
         </div>
-        <table className="Table">
-          <thead>
-            <tr>
-              <th>Артикул</th>
-              <th>Краткое описание</th>
-              <th>Всего на складе</th>
-              <th>Продано</th> 
-              <th>Остаток</th> 
-              <th>Примечание</th> 
-              <th>Удалить / Изменить</th>
-            </tr>
-          </thead>
-          <tbody>{students}</tbody>
-        </table>
+        <div className="Table-Scroll">
+          <table className="Table">
+            <thead>
+              <tr>
+                <th>Артикул</th>
+                <th>Краткое описание</th>
+                <th>Всего на складе</th>
+                <th>Продано</th> 
+                <th>Остаток</th> 
+                <th>Примечание</th> 
+                <th>Удалить / Изменить</th>
+              </tr>
+            </thead>
+            <tbody>{students}</tbody>
+          </table>
+        </div>
       </div>
     );
   }

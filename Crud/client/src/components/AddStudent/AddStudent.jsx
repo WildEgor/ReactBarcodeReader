@@ -58,7 +58,23 @@ const AddStudent = props => {
               remind: info.remind,
               notes: info.notes
             })
-            toast("Товар " + newStudent.data.newStudent.articul + " успешно добавлен" ,{ type: toast.TYPE.SUCCESS, autoClose: 3000 });
+            toast(
+              "Товар " + newStudent.data.newStudent.articul + " успешно добавлен" ,
+              { type: toast.TYPE.SUCCESS, 
+                autoClose: 1000,
+                onClose: () => {
+                  const form = document.querySelector('.Add-Student-Form')
+                  let formInputs = form.getElementsByTagName("input");
+                  let formTextarea = form.getElementsByTagName("textarea");
+
+                  Array.from(formInputs).forEach(
+                    input => (input.value = "")
+                  );
+                  Array.from(formTextarea).forEach(
+                    input => (input.value = "")
+                  );
+                  console.log(formInputs)
+                } });
           } catch(err) {
             toast(err.message ,{ type: toast.TYPE.ERROR, autoClose: 3000 });
           }
@@ -74,11 +90,12 @@ const AddStudent = props => {
   const notify = (itemList) => {
     console.log('itemList', itemList)
     toast(<ChangeDialog itemsList={itemList} />, {
+      type: toast.TYPE.WARNING,
       toastId: customId,
       position: "top-left",
       autoClose: 3000,
       autoClose: true,
-      hideProgressBar: true,
+      hideProgressBar: false,
       closeOnClick: false,
       pauseOnHover: true,
       draggable: true,

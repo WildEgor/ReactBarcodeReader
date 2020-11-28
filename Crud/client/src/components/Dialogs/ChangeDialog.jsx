@@ -51,7 +51,7 @@ export default function ChangeDialog(props) {
   const renderMenuItems = () => {
     const listItems = props.itemsList.map((item) => {
         return(
-            <MenuItem value={item._id} key={item._id.toString()}>{item._id}</MenuItem>
+            <MenuItem value={item._id} key={item._id.toString()}>{item.articul} | {item.desc}</MenuItem>
         )
     });
     setItemLs(listItems)
@@ -69,7 +69,7 @@ export default function ChangeDialog(props) {
 
   return (
     <div>
-        <h3>"Товар уже существует!"</h3>
+        <h3 style={{color: "black"}}>"Товар уже существует!"</h3>
       <Button
             variant="contained"
             color="primary"
@@ -80,7 +80,7 @@ export default function ChangeDialog(props) {
           >
           Изменить
         </Button>
-        <Badge badgeContent={Array.from(props.itemsList).length} max={999} {...defaultProps} />
+        <Badge className={classes.margin} color="primary" badgeContent={Array.from(props.itemsList).length} max={999} {...defaultProps} />
       <Dialog
         open={open}
         onClose={handleClose}
@@ -96,6 +96,7 @@ export default function ChangeDialog(props) {
             labelId="demo-simple-select-label"
             id="demo-simple-select"
             value={item}
+            defaultValue={item[0]}
             onChange={handleChange}
             >
             {

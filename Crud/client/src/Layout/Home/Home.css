@@ -8,17 +8,24 @@
 .Table {
   border-collapse: collapse;
   text-align: left;
-  width: 80%;
-  margin-top: 1rem;
+  width: 100%;
+  margin: 0 auto;
   color: #fff;
 }
 
 .Table-Search {
   display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.Table-Scroll {
+  max-height: 80vh;
+  overflow-y: scroll;
 }
 
 thead {
-  background-color: #6200ea;
+  background-color:#00796b;
   border-radius: 100px;
 }
 
@@ -27,7 +34,7 @@ tr {
 }
 
 tr:nth-child(even) {
-  background-color: #F8F6FF;
+  background-color: #e7f0ef;
 }
 
 th {
@@ -83,6 +90,7 @@ td {
 
 .Add-Button{
   display: flex;
+  height: 2rem;
   padding: 0px;
   color: #fff;
   transition: .7s color ease;

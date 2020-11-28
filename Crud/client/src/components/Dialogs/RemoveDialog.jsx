@@ -53,7 +53,7 @@ export default function RemoveDialog(props) {
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogTitle id="alert-dialog-title">{` Товар - Артикул: ${props.item.articul}?`}</DialogTitle>
+        <DialogTitle id="alert-dialog-title">{` Товар - Артикул: ${props.item.articul}`}</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
             {`Удалить выбранный товар?`}
