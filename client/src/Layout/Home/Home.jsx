@@ -88,7 +88,6 @@ class Home extends Component {
       <GlobalContext.Consumer>
       {({isToggle}) => {
         if (isToggle){
-          console.log(isToggle)
           return (
             <Scanner onDetected={this.getBarcode} />
           )

@@ -69,7 +69,8 @@ export default function ChangeDialog(props) {
 
   return (
     <div>
-        <h3 style={{color: "black"}}>"Товар уже существует!"</h3>
+      <h3 style={{color: "black"}}>"Товар уже существует!"</h3>
+      <Badge className={classes.margin} color="primary" badgeContent={Array.from(props.itemsList).length} max={999} {...defaultProps} />
       <Button
             variant="contained"
             color="primary"
@@ -80,7 +81,6 @@ export default function ChangeDialog(props) {
           >
           Изменить
         </Button>
-        <Badge className={classes.margin} color="primary" badgeContent={Array.from(props.itemsList).length} max={999} {...defaultProps} />
       <Dialog
         open={open}
         onClose={handleClose}

@@ -4,6 +4,8 @@ import axios from "axios";
 import {toast, ToastContainer} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+import { withRouter } from "react-router-dom";
+
 import Button from '@material-ui/core/Button';
 import SaveIcon from '@material-ui/icons/Save';
 import SearchIcon from '@material-ui/icons/Search';
@@ -41,6 +43,19 @@ const AddStudent = props => {
     });
   }
 
+  const resetForm = () => {
+    const form = document.querySelector('.Add-Student-Form')
+    let formInputs = form.getElementsByTagName("input");
+    let formTextarea = form.getElementsByTagName("textarea");
+
+    Array.from(formInputs).forEach(
+      input => (input.value = "")
+    );
+    Array.from(formTextarea).forEach(
+      input => (input.value = "")
+    );
+  }
+
   const addStudent = e => {
     e.preventDefault();
     searchItems('articul').then(
@@ -62,19 +77,8 @@ const AddStudent = props => {
               "Товар " + newStudent.data.newStudent.articul + " успешно добавлен" ,
               { type: toast.TYPE.SUCCESS, 
                 autoClose: 1000,
-                onClose: () => {
-                  const form = document.querySelector('.Add-Student-Form')
-                  let formInputs = form.getElementsByTagName("input");
-                  let formTextarea = form.getElementsByTagName("textarea");
-
-                  Array.from(formInputs).forEach(
-                    input => (input.value = "")
-                  );
-                  Array.from(formTextarea).forEach(
-                    input => (input.value = "")
-                  );
-                  console.log(formInputs)
-                } });
+                onClose:  resetForm
+              })
           } catch(err) {
             toast(err.message ,{ type: toast.TYPE.ERROR, autoClose: 3000 });
           }
@@ -94,7 +98,6 @@ const AddStudent = props => {
       toastId: customId,
       position: "top-left",
       autoClose: 3000,
-      autoClose: true,
       hideProgressBar: false,
       closeOnClick: false,
       pauseOnHover: true,
@@ -113,7 +116,9 @@ const AddStudent = props => {
         if (isExist) {
           notify(itemList)
         } else {
-          toast("Такого товара еще нет на складе!" ,{ type: toast.TYPE.SUCCESS, autoClose: 3000, position: "top-center" });
+          if (name !== null){
+            toast("Такого товара еще нет на складе!" ,{ type: toast.TYPE.SUCCESS, autoClose: 3000, position: "top-center" });
+          }
         }
       })
     }
@@ -137,7 +142,11 @@ const AddStudent = props => {
   }
 
   useEffect(() => {
+    const form = document.querySelector('.Add-Student-Form')
+    let formInputs = form.getElementsByTagName("input");
+
     if (typeof props.location.query !== "undefined"){
+      Array.from(formInputs)[0].value = props.location.query
       setInfo(old => {
         let newObj = {...old}
         newObj.articul = props.location.query
@@ -157,7 +166,6 @@ const AddStudent = props => {
             type="text"
             placeholder="Артикул..."
             name="articul"
-            value={info.articul}
             onChange={onChangeHandler}
             className="Add-Student-Input"
             required
@@ -257,6 +265,7 @@ const AddStudent = props => {
             </Button>
             <Button
             type="reset"
+            onClick={resetForm}
             variant="contained"
             color="secondary"
             className={classes.button}
@@ -271,4 +280,4 @@ const AddStudent = props => {
     );
 }
 
-export default AddStudent;
+export default withRouter(AddStudent);
