@@ -19,14 +19,32 @@
   align-items: center;
 }
 
-.Table-Scroll {
-  max-height: 80vh;
-  overflow-y: scroll;
+.Table-FixHead {
+  overflow-y: auto;
+  height: 50vh;
 }
 
-thead {
+
+.Table-FixHead thead th {
+  position: sticky;
+  top: 0;
   background-color:#00796b;
-  border-radius: 100px;
+  z-index: 9999;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th,
+td {
+  padding: 8px 16px;
+  border: 1px solid #ccc;
+}
+
+th {
+  background: #eee;
 }
 
 tr {

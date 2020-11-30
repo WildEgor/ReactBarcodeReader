@@ -3,7 +3,8 @@ import "./Home.css";
 import axios from "axios";
 import { PropagateLoader } from 'react-spinners';
 // Components
-import Student from "../../components/Student/Student";
+//import Student from "../../components/Student/Student";
+import HomeTable from "../../components/HomeTable/HomeTable"
 import SearchStudents from "../../components/SearchStudent/SearchStudents";
 import Scanner from '../../components/Scanner/Scanner'
 import GlobalContext from '../../Context/GlobalContext';
@@ -19,16 +20,14 @@ class Home extends Component {
 
   async componentDidMount() {
     try {
-      console.log('First search!')
       const students = await axios("/api/items/");
-      this.setState({ data: students.data });
+      this.setState({ data: students.data })
     } catch (err) {
       this.setState({ error: err.message });
     }
   }
 
   getBarcode = barCode => {
-    console.log('Result', barCode.codeResult.code)
     this.setState({barcode: barCode.codeResult.code})
   }
 
@@ -68,15 +67,18 @@ class Home extends Component {
   };
 
   render(){
-    let students
+    // let students
 
-    if (this.state.data)
-      students =
-        this.state.data.students &&
-        this.state.data.students.map(student => (
-          <Student key={student._id} {...student} removeStudent={this.removeStudent} />
-        ));
-    else return <div className="Spinner-Wrapper"> <PropagateLoader color={'#333'} /> </div>;
+    if (!this.state.data)
+    {
+    
+      // students =
+      //   this.state.data.students &&
+      //   this.state.data.students.map(student => (
+      //     <Student key={student._id} {...student} removeStudent={this.removeStudent} />
+      //   ));
+    return <div className="Spinner-Wrapper"> <PropagateLoader color={'#333'} /> </div>;
+    }
 
     if (this.state.error) return <h1>{this.state.error}</h1>;
     if (this.state.data !== null)
@@ -98,7 +100,8 @@ class Home extends Component {
         <div className="Table-Search">
           <SearchStudents searchStudents={this.searchStudents} scannerSearch={this.state.barcode}/>
         </div>
-        <div className="Table-Scroll">
+        <HomeTable table={ this.state.data.students } removeItem={ this.removeStudent }/>
+        {/* <div className="Table-FixHead">
           <table className="Table">
             <thead>
               <tr>
@@ -111,9 +114,9 @@ class Home extends Component {
                 <th>Удалить / Изменить</th>
               </tr>
             </thead>
-            <tbody>{students}</tbody>
+            <tbody>{students}</tbody> 
           </table>
-        </div>
+        </div>  */}
       </div>
     );
   }

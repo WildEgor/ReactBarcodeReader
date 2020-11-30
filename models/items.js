@@ -17,16 +17,23 @@ const itemsSchema = new mongoose.Schema({
   },
   countAll: {
     type: Number,
+    required: true,
     min: 0,
     max: 120
   },
   sold: {
     type: Number,
+    required: true,
+    validate: [
+      dateValidator,
+      "Invalid values"
+    ],
     min: 0,
     max: 120
   },
   remind: {
     type: Number,
+    required: true,
     min: 0,
     max: 120
   },
@@ -39,7 +46,12 @@ const itemsSchema = new mongoose.Schema({
   },
 });
 
+// function that validate the startDate and endDate
+function dateValidator(value) {
+  // `this` is the mongoose document
+  return this.countAll >= value;
+}
+
+itemsSchema.set('validateBeforeSave', true);
+
 module.exports = mongoose.model('items', itemsSchema);
-
-
-

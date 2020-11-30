@@ -29,7 +29,7 @@ export default function RemoveDialog(props) {
   const handleClose = e => {
     let answer = e.target.textContent.toString()
     if (answer.localeCompare("Да")? false: true){
-        props.onRemove(props.item._id)
+        props.onRemove(props.item)
         console.log('Remove')
     }
     setOpen(false);
