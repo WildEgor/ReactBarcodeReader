@@ -55,26 +55,3 @@
   margin-left: 50px;
 }
 
-.Add-Student-Submit, .Add-Student-Reset {
-  width: 45px;
-  height: 40px;
-  color: #fff;
-  border: none;
-  margin-left: 18px;
-  border-radius: 2px;
-  cursor: pointer;
-  outline: none;
-}
-
-.Add-Student-Submit {
-  background-color: #6200ea;
-}
-
-.Add-Student-Reset {
-  background-color: red
-}
-
-label {
-  
-  padding-left: 2%;
-}

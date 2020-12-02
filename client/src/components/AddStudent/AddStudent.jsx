@@ -16,12 +16,16 @@ import ChangeDialog from '../Dialogs/ChangeDialog'
 
 const useStyles = makeStyles((theme) => ({
   button: {
-    margin: theme.spacing(1),
+    margin: theme.spacing(0.5),
+    padding: 'auto'
   },
 }));
 
 const AddStudent = props => {
   const classes = useStyles();
+  const [forma, setForma] = useState({})
+  const [showDialog, setShowDialog] = useState(false)
+  const [itemList, setItemList] = useState([])
 
   const [info, setInfo] = useState({
     articul: "",
@@ -33,12 +37,9 @@ const AddStudent = props => {
     response: ""
   })
 
-  const [forma, setForma] = useState({})
-
   const onChangeHandler = e => {
     let inputValue = e.target.value
     let inputName = e.target.name
-    console.log(inputName)
     setInfo(oldObject => {
       let newObject = {...oldObject}
       newObject[inputName] = inputValue
@@ -48,7 +49,6 @@ const AddStudent = props => {
   }
 
   const checkInputs = formValues => {
-    
     if (parseInt(formValues.sold) > parseInt(formValues.countAll)){
       formValues.sold = formValues.countAll
     }
@@ -78,7 +78,6 @@ const AddStudent = props => {
     e.preventDefault();
     searchItems('articul').then(
       async (value) => {
-        console.log('isExist', value)
         let isExist = value.length ? true : false;
         console.log('isExist', isExist)
         if (!isExist){
@@ -94,36 +93,19 @@ const AddStudent = props => {
             toast(
               "Товар " + newStudent.data.newStudent.articul + " успешно добавлен" ,
               { type: toast.TYPE.SUCCESS, 
-                autoClose: 1000,
+                autoClose: 3000,
                 onClose:  resetForm
               })
           } catch(err) {
-            //console.log(info.response)
             toast(err.message ,{ type: toast.TYPE.ERROR, autoClose: 3000 });
           }
         } else {
-          notify(value)
+            setItemList(value)
+            setShowDialog(true)
         }
       }
     )
   };
-
-  const customId = "custom-id-yes";
-
-  const notify = (itemList) => {
-    console.log('itemList', itemList)
-    toast(<ChangeDialog itemsList={itemList} />, {
-      type: toast.TYPE.WARNING,
-      toastId: customId,
-      position: "top-left",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: false,
-      pauseOnHover: true,
-      draggable: true,
-      progress: true
-    }) 
-  }
 
   const quickSearch = name => {
     let searchQuery = info[name]
@@ -133,7 +115,8 @@ const AddStudent = props => {
         const itemsCount = value.length
         let isExist = itemsCount ? true : false
         if (isExist) {
-          notify(itemList)
+          setItemList(itemList)
+          setShowDialog(true)
         } else {
           if (name !== null){
             toast("Такого товара еще нет на складе!" ,{ type: toast.TYPE.SUCCESS, autoClose: 3000, position: "top-center" });
@@ -144,7 +127,6 @@ const AddStudent = props => {
   }
 
   const searchItems = async query => {
-    console.log(query)
     try {
     const allStudents = await axios("/api/items/")
 
@@ -156,7 +138,7 @@ const AddStudent = props => {
     })
     return items
     } catch(err){
-    toast(err.message ,{ type: toast.TYPE.ERROR, autoClose: 3000 });
+      toast(err.message ,{ type: toast.TYPE.ERROR, autoClose: 3000 });
     }
   }
 
@@ -196,6 +178,7 @@ const AddStudent = props => {
 
     return (
       <div className='AddStudent-Wrapper'>
+        {showDialog? <ChangeDialog itemsList={itemList} info={info} /> : null}
         <h1>Добавить товар:</h1>
         <form onSubmit={addStudent} className="Add-Student-Form">
           <label htmlFor="articul">

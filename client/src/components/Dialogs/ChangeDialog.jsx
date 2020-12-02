@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { Fragment, useEffect } from 'react';
 import Button from '@material-ui/core/Button';
 import BorderColorIcon from '@material-ui/icons/BorderColor';
 import Dialog from '@material-ui/core/Dialog';
@@ -30,15 +30,11 @@ const useStyles = makeStyles((theme) => ({
 
 export default function ChangeDialog(props) {
     const classes = useStyles();
-    const [open, setOpen] = React.useState(false);
+    const [open, setOpen] = React.useState(true);
     const [item, setItem] = React.useState('');
     const[itemLs, setItemLs] = React.useState(
-        <MenuItem value={10}>Ten</MenuItem>
+        <MenuItem value={10}></MenuItem>
     );
-
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
 
   const handleClose = e => {
     setOpen(false);
@@ -68,27 +64,16 @@ export default function ChangeDialog(props) {
   };
 
   return (
-    <div>
-      <h3 style={{color: "black"}}>"Товар уже существует!"</h3>
-      <Badge className={classes.margin} color="primary" badgeContent={Array.from(props.itemsList).length} max={999} {...defaultProps} />
-      <Button
-            variant="contained"
-            color="primary"
-            size="small"
-            className={classes.button}
-            startIcon={<BorderColorIcon />}
-            onClick={handleClickOpen}
-          >
-          Изменить
-        </Button>
+    <Fragment>
       <Dialog
-        open={open}
+        open={true}
         onClose={handleClose}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
         <DialogTitle id="alert-dialog-title">{`Изменить запись`}</DialogTitle>
         <DialogContent>
+          <Badge className={classes.margin} color="primary" badgeContent={Array.from(props.itemsList).length} max={999} {...defaultProps} />
           <DialogContentText id="alert-dialog-description">
             {`Выбрать запись:`}
           </DialogContentText>
@@ -118,6 +103,6 @@ export default function ChangeDialog(props) {
         </Link>
         </DialogActions>
       </Dialog>
-    </div>
+    </Fragment>
   );
 }

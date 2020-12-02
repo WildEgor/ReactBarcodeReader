@@ -3,7 +3,6 @@ import "./Home.css";
 import axios from "axios";
 import { PropagateLoader } from 'react-spinners';
 // Components
-//import Student from "../../components/Student/Student";
 import HomeTable from "../../components/HomeTable/HomeTable"
 import SearchStudents from "../../components/SearchStudent/SearchStudents";
 import Scanner from '../../components/Scanner/Scanner'
@@ -30,7 +29,7 @@ class Home extends Component {
   getBarcode = barCode => {
     this.setState({barcode: barCode.codeResult.code})
   }
-
+  
   removeStudent = async id => {
     console.log('Try delete...')
     try {
@@ -42,13 +41,15 @@ class Home extends Component {
     }
   };
 
-  searchStudents = async username => {
+  searchStudents = async (username, query) => {
     let allStudents = [...this.state.data.students];
     let isFound;
     if (this.state.allStudents === null) this.setState({ allStudents });
-
-    let students = this.state.data.students.filter(({ articul }) =>
-      (articul.toLowerCase().includes(username.toLowerCase()) && articul.length === username.length)
+    console.log('Query', query)
+    let students = this.state.data.students.filter((item, ind, arr) => {
+      console.log(query)
+      return (item[query].toLowerCase().includes(username.toLowerCase()) && item[query].length === username.length)
+    } 
     );
 
     console.log(students.length)
@@ -67,21 +68,11 @@ class Home extends Component {
   };
 
   render(){
-    // let students
-
     if (!this.state.data)
-    {
-    
-      // students =
-      //   this.state.data.students &&
-      //   this.state.data.students.map(student => (
-      //     <Student key={student._id} {...student} removeStudent={this.removeStudent} />
-      //   ));
-    return <div className="Spinner-Wrapper"> <PropagateLoader color={'#333'} /> </div>;
-    }
+      return <div className="Spinner-Wrapper"> <PropagateLoader color={'#333'} /> </div>;
 
     if (this.state.error) return <h1>{this.state.error}</h1>;
-    if (this.state.data !== null)
+    if (this.state.data !== null && this.state.data !== undefined)
       if (!this.state.data.students.length)
         return <h1 className="No-Students">В базе данных отсутствуют записи!</h1>;
 
@@ -101,22 +92,6 @@ class Home extends Component {
           <SearchStudents searchStudents={this.searchStudents} scannerSearch={this.state.barcode}/>
         </div>
         <HomeTable table={ this.state.data.students } removeItem={ this.removeStudent }/>
-        {/* <div className="Table-FixHead">
-          <table className="Table">
-            <thead>
-              <tr>
-                <th>Артикул</th>
-                <th>Краткое описание</th>
-                <th>Всего на складе</th>
-                <th>Продано</th> 
-                <th>Остаток</th> 
-                <th>Примечание</th> 
-                <th>Удалить / Изменить</th>
-              </tr>
-            </thead>
-            <tbody>{students}</tbody> 
-          </table>
-        </div>  */}
       </div>
     );
   }
