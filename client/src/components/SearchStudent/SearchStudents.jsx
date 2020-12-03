@@ -56,6 +56,7 @@ const SearchStudents = props => {
   const [value, setValue] = useState("")
   const [isFound, setIsFound] = useState(true)
 
+  // 
   const handleChange = e => {
     console.log(e.target.value)
     setValue(e.target.value)
@@ -81,21 +82,19 @@ const SearchStudents = props => {
     renderMenuItems()
   }, [])
 
+  // Если что-то обнаружил сканнер, то 
   useEffect(() => {
-    console.log('Its me, scanner!', props.scannerSearch);
     setValue(props.scannerSearch)
     letSearch(props.scannerSearch)
   }, [props.scannerSearch])
 
   const letSearch = query => {
+    // Если ввели значение отличное от предыдущего (наверное это так будет работать :))
     if (value !== query){
-      console.log('Search...', `${value} and ${query}`)
       setValue(query)
-      let isFound = props.searchStudents(query, searchItem)
-      isFound.then(resolve => setIsFound(resolve))
-      console.log('value', value)
+      let isFound = props.searchStudents(query, searchItem) // Передаем запрос к родителю и делаем поиск
+      isFound.then(resolve => setIsFound(resolve)) // Если найдено что-то устанавливаем флаг
     } else {
-      console.log('Not Search')
       setIsFound(false)
     }
   }

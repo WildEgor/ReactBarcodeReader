@@ -21,6 +21,7 @@ class Home extends Component {
     try {
       const students = await axios("/api/items/");
       this.setState({ data: students.data })
+      this.searchStudents("", 'articul')
     } catch (err) {
       this.setState({ error: err.message });
     }
@@ -42,27 +43,29 @@ class Home extends Component {
   };
 
   searchStudents = async (username, query) => {
+    
     let allStudents = [...this.state.data.students];
-    let isFound;
+    let isFound = false;
     if (this.state.allStudents === null) this.setState({ allStudents });
-    console.log('Query', query)
-    let students = this.state.data.students.filter((item, ind, arr) => {
-      console.log(query)
-      return (item[query].toLowerCase().includes(username.toLowerCase()) && item[query].length === username.length)
+
+    
+
+    let students = this.state.data.students.filter(item => {
+      return (item[query].toLowerCase().includes(username.toLowerCase()))
     } 
     );
 
-    console.log(students.length)
     if (students.length > 0) {
-      this.setState({ query: username })
       isFound = true
       this.setState({ data: { students } });
     } else {
       isFound = false
     }
 
-    if (username.trim() === "")
+    if (username.trim() === ""){
       this.setState({ data: { students: this.state.allStudents } });
+      return isFound
+    }
   
     return isFound
   };
@@ -72,7 +75,6 @@ class Home extends Component {
       return <div className="Spinner-Wrapper"> <PropagateLoader color={'#333'} /> </div>;
 
     if (this.state.error) return <h1>{this.state.error}</h1>;
-    if (this.state.data !== null && this.state.data !== undefined)
       if (!this.state.data.students.length)
         return <h1 className="No-Students">В базе данных отсутствуют записи!</h1>;
 

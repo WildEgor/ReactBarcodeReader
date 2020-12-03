@@ -53,19 +53,39 @@ const Scanner = props => {
           constraints: {
             width: 1920,
             height: 200,
-            facingMode: 'enviroment', // or user
+            facingMode: 'user', // or user
           },
         },
         locator: {
           patchSize: 'medium',
           halfSample: false,
+        //   debug: {
+        //     showCanvas: true,
+        //     showPatches: true,
+        //     showFoundPatches: true,
+        //     showSkeleton: true,
+        //     showLabels: true,
+        //     showPatchLabels: true,
+        //     showRemainingPatchLabels: true,
+        //     boxFromPatches: {
+        //       showTransformed: true,
+        //       showTransformedBox: true,
+        //       showBB: true
+        //     }
+        //   }
         },
         numOfWorkers: 2,
         decoder: {
           readers: ['code_128_reader', 'code_39_reader', 'upc_reader', 'ean_reader'],
         },
         locate: true,
-        frequency: 1
+        frequency: 1,
+        // debug: {
+        //     drawBoundingBox: true,
+        //     showFrequency: true,
+        //     drawScanline: true,
+        //     showPattern: true
+        // }
       }
     )
 

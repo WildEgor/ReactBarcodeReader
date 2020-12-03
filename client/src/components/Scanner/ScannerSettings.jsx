@@ -54,13 +54,21 @@ const ScannerSettings = props => {
         {value: "code_128_reader", label:"Code 128"}, 
         {value: "code_39_reader", label: "Code 39"},
         {value: "upc_reader", label: "Upc"},
-        {value: "ean_reader", label: "Ean"}
+        {value: "ean_reader", label: "Ean"},
+        {value: "ean_8_reader", label: "Ean 8"},
+        {value: "code_39_vin_reader", label: "Code 39 Vin"},
+        {value: "codabar_reader", label: "Codebar"},
+        {value: "upc_e_reader", label: "Upc E"},
+        {value: "i2of5_reader", label: "Code i2of5"},
+        {value: "2of5_reader", label: "Code 2of5"},
+        {value: "code_93_reader", label: "Code 93"}
         ],
         pathSize: [
         {value: "x-small", label:"XSmall"}, 
         {value: "small", label: "Small"},
         {value: "medium", label: "Medium"},
-        {value: "large", label: "Large"}
+        {value: "large", label: "Large"},
+        {value: "x-large", label: "XLarge"},
         ],
         freq: [
         {value: 1, label:"Very slow"}, 
