@@ -115,14 +115,6 @@ const SearchStudents = props => {
       </Select>
     </FormControl>
     <div style={{display: "flex", flexDirection: "row"}}>
-      {/* <input
-        value={value}
-        type="text"
-        placeholder="Поиск..."
-        name="searchField"
-        onChange={ handleChange }
-        className="Search-Student-Input"
-      /> */}
       <InputBase
         value={value}
         name="searchField"
@@ -131,31 +123,22 @@ const SearchStudents = props => {
         placeholder="Поиск товара на складе..."
         inputProps={{ 'aria-label': 'search google maps' }}
       />
-      <IconButton className={classes.iconButton} aria-label="search">
-        <SearchIcon />
-      </IconButton>
-    </div>
-    </Paper>
-    {(!isFound && value !== "")? 
+      {(!isFound && value !== "")? 
           <Link 
             to={
               { 
                   pathname: "/add",
                   query : value
               }
-          } 
+            } 
           className="Add-Button">
-            <Button
-              variant="contained"
-              color="primary"
-              size="small"
-              className="button"
-              startIcon={<CreateIcon />}
-            >
-            Добавить
-            </Button>
+            <IconButton className={classes.iconButton} aria-label="search" >
+              <CreateIcon />
+            </IconButton>
           </Link>
           :null }
+    </div>
+    </Paper>
     </Fragment>
   );
 }

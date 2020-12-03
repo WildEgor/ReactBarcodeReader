@@ -1,9 +1,49 @@
-import React, { Fragment, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Quagga from 'quagga'
 import ScannerSettings from '../../components/Scanner/ScannerSettings'
 import './Scanner.css'
 
+import Box from '@material-ui/core/Box';
+import Grid from '@material-ui/core/Grid';
+import { makeStyles } from '@material-ui/core/styles';
+import Paper from '@material-ui/core/Paper';
+
+const useStyles = makeStyles((theme) => ({
+    root: {
+        [theme.breakpoints.down('xs')]: {
+            width: "100vh",
+            flexDirection: "column",
+          },
+          [theme.breakpoints.up('lg')]: {
+            flexDirection: "row",
+          },
+        display: "flex",
+        flexGrow: 1, 
+        alignItems: "center"
+    },
+    paper: {
+      padding: theme.spacing(2),
+      textAlign: 'center',
+      color: theme.palette.text.secondary,
+    },
+    item: {
+        [theme.breakpoints.down('xs')]: {
+            width: "50vh",
+          },
+        [theme.breakpoints.up('lg')]: {
+            width: "50vh",
+            },
+    },
+    scanner: {
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+    }
+  }));
+
 const Scanner = props => { 
+    const classes = useStyles();
+
     const [config, setConfig] = useState(
       {
         inputStream : {
@@ -83,19 +123,9 @@ const Scanner = props => {
     const _shouldComponentUpdate = configData => {
         setConfig(oldConf => {
             let newConf = {...oldConf}
-            switch(configData.actionMeta.name) {
-                case 'freqSpeed': 
-                    newConf.frequency = configData.newValue.value
-                    break;
-                case 'funcCode':
-                    if (configData.newValue !== null) {
-                        newConf.decoder.readers = [...configData.newValue].map(a => a.value);
-                    }
-                    break;
-                case 'patchSize': 
-                    newConf.locator.patchSize = configData.newValue.value
-                    break;
-            }
+            newConf.frequency = configData.freq
+            newConf.decoder.readers = configData.funcCode
+            newConf.locator.patchSize = configData.patchSize
             return newConf
         })
         try{
@@ -123,12 +153,19 @@ const Scanner = props => {
     }, [])
     
     return (
-    <Fragment>
-        <div className="vieport-wrapper">
-            <div id="interactive" className="viewport"/>
-            <ScannerSettings updateSettings={_shouldComponentUpdate} />
-        </div>
-    </Fragment>
+    
+        <Grid container spacing={20} className={classes.scanner}>
+        <Paper elevation={3} className={classes.root}>
+            <Grid item className={classes.item} lg={10} xs={12}>
+                <Box className="vieport-wrapper" color="text.primary"/>
+                <Box id="interactive" className="viewport"/>
+            </Grid>
+            <Grid item className={classes.item} lg={2} xs={12}>
+                <ScannerSettings updateSettings={_shouldComponentUpdate} />
+            </Grid>
+        </Paper> 
+    </Grid> 
+    
     );
 }
 

@@ -79,15 +79,8 @@ class Home extends Component {
     return (
       <div className="Table-Wrapper">
       <GlobalContext.Consumer>
-      {({isToggle}) => {
-        if (isToggle){
-          return (
-            <Scanner onDetected={this.getBarcode} />
-          )
-        }
-      }}
+        {({isToggle}) => { if (isToggle) return ( <Scanner onDetected={this.getBarcode} /> ) }}
       </GlobalContext.Consumer>
-        <h1>Товар на складе:</h1>
         <div className="Table-Search">
           <SearchStudents searchStudents={this.searchStudents} scannerSearch={this.state.barcode}/>
         </div>

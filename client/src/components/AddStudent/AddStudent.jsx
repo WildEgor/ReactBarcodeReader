@@ -11,28 +11,45 @@ import SaveIcon from '@material-ui/icons/Save';
 import SearchIcon from '@material-ui/icons/Search';
 import RotateLeftRoundedIcon from '@material-ui/icons/RotateLeftRounded';
 import { makeStyles } from '@material-ui/core/styles';
+import TextField from '@material-ui/core/TextField';
 
 import ChangeDialog from '../Dialogs/ChangeDialog'
 
+import CircularProgress from '@material-ui/core/CircularProgress';
+import Backdrop from '@material-ui/core/Backdrop';
+
 const useStyles = makeStyles((theme) => ({
+  root: {
+    display: 'flex',
+    '& > * + *': {
+      marginLeft: theme.spacing(2),
+    },
+    backdrop: {
+      zIndex: theme.zIndex.drawer + 999,
+      color: '#fff',
+    },
+  },
   button: {
     margin: theme.spacing(0.5),
     padding: 'auto'
   },
+  progress: {
+    position: "absolute"
+  }
 }));
 
 const AddStudent = props => {
   const classes = useStyles();
-  const [forma, setForma] = useState({})
   const [showDialog, setShowDialog] = useState(false)
   const [itemList, setItemList] = useState([])
+  const [isFound, setIsFound] = useState(false)
 
   const [info, setInfo] = useState({
     articul: "",
     desc: "",
-    countAll: "",
-    sold: "",
-    remind: "",
+    countAll: 0,
+    sold: 0,
+    remind: 0,
     notes: "",
     response: ""
   })
@@ -49,37 +66,26 @@ const AddStudent = props => {
   }
 
   const checkInputs = formValues => {
-    if (parseInt(formValues.sold) > parseInt(formValues.countAll)){
-      formValues.sold = formValues.countAll
-    }
     formValues.remind = formValues.countAll - formValues.sold
-
-    forma.formInputs.forEach(item => {
-      if (item.name == 'sold')
-        item.value = formValues.sold
-      if (item.name == 'countAll')
-        item.value = formValues.countAll
-      if (item.name == 'remind')
-        item.value = formValues.countAll - formValues.sold
-    })
+    if (formValues.remind < 0)
+      formValues.remind = 0
     return formValues
   }
 
-  const resetForm = () => { 
-    forma.formInputs.forEach(
-      input => (input.value = "")
-    );
-    forma.formTextarea.forEach(
-      input => (input.value = "")
-    );
+  const resetForm = () => {
+    setInfo(item => {
+      let newItem = {...item}
+      for(let prop in newItem){ newItem[prop] = "" }
+      return newItem
+    }) 
   }
 
   const addStudent = e => {
     e.preventDefault();
     searchItems('articul').then(
-      async (value) => {
-        let isExist = value.length ? true : false;
-        console.log('isExist', isExist)
+      async (itemList) => {
+        setIsFound(false)
+        let isExist = itemList.length ? true : false;
         if (!isExist){
           try {
             let newStudent = await axios.post("/api/items", {
@@ -100,7 +106,8 @@ const AddStudent = props => {
             toast(err.message ,{ type: toast.TYPE.ERROR, autoClose: 3000 });
           }
         } else {
-            setItemList(value)
+            setItemList(itemList)
+            console.log('Smt found', itemList)
             setShowDialog(true)
         }
       }
@@ -108,28 +115,27 @@ const AddStudent = props => {
   };
 
   const quickSearch = name => {
-    let searchQuery = info[name]
-    if (searchQuery) {
-      searchItems(name).then( value => {
-        let itemList = value
-        const itemsCount = value.length
-        let isExist = itemsCount ? true : false
+    if (info[name]) {
+      searchItems(name).then( itemList => {
+        setIsFound(false)
+        let isExist = itemList.length ? true : false;
         if (isExist) {
           setItemList(itemList)
           setShowDialog(true)
+          console.log('Smt found', itemList)
         } else {
-          if (name !== null){
             toast("Такого товара еще нет на складе!" ,{ type: toast.TYPE.SUCCESS, autoClose: 3000, position: "top-center" });
-          }
         }
       })
+    } else {
+      toast("Вы не ввели значение в поле поиска!" ,{ type: toast.TYPE.WARNING, autoClose: 3000, position: "top-center" });
     }
   }
 
   const searchItems = async query => {
     try {
+    setIsFound(true)
     const allStudents = await axios("/api/items/")
-
     let items = allStudents.data.students.filter(item => {
       if (item[query].toLowerCase() !== info[query].toLowerCase()){
         return false
@@ -138,63 +144,49 @@ const AddStudent = props => {
     })
     return items
     } catch(err){
+      setIsFound(false)
       toast(err.message ,{ type: toast.TYPE.ERROR, autoClose: 3000 });
     }
   }
 
-  const getForm = () => {
-    const form = document.querySelector('.Add-Student-Form')
-    let formInputs = Array.from(form.getElementsByTagName("input"));
-    let formTextarea = Array.from(form.getElementsByTagName("textarea"));
-    return {formInputs, formTextarea}
-  }
-
   useEffect(() => {
-    let { formInputs, formTextarea } = getForm(); 
-    setForma({ formInputs, formTextarea })
-
     if (typeof props.location.query !== "undefined"){
-      formInputs[0].value = props.location.query
       setInfo(old => {
         let newObj = {...old}
         newObj.articul = props.location.query
         return newObj
       })
     }
-    
-    formInputs.filter(item => {
-      if (item.name == 'countAll' || item.name == 'sold' || item.name == 'remind'){
-        item.value = 0
-        setInfo(old => {
-          let newObj = {...old}
-          newObj[item.name] = 0
-          return newObj
-        })
-        return true
-      }
-      return false
-    })
   }, [])
 
     return (
       <div className='AddStudent-Wrapper'>
-        {showDialog? <ChangeDialog itemsList={itemList} info={info} /> : null}
+        {isFound?
+        <Backdrop className={classes.backdrop} open={isFound} >
+          <CircularProgress className={classes.progress} />
+        </Backdrop>
+        : null}
+        {showDialog? <ChangeDialog itemsList={itemList} info={info} onShow={setShowDialog} /> : null}
         <h1>Добавить товар:</h1>
         <form onSubmit={addStudent} className="Add-Student-Form">
           <label htmlFor="articul">
           <h4>Артикул:</h4>
           <div className="Add-Student-Input-Search">
-          <input
-            type="text"
-            placeholder="Артикул..."
+          <TextField 
+            id="articul"
             name="articul"
-            value={info.articul}
-            onChange={onChangeHandler}
+            label="Артикул" 
+            variant="outlined" 
             className="Add-Student-Input"
             required
-            minLength="3"
-            maxLength="255"
-            id="articul"
+            InputProps={{
+              inputProps: { 
+                value: info.articul,
+                minLength: "3", 
+                maxLength: "255"
+              }
+            }}
+            onChange={onChangeHandler}
           />
           <Button
             variant="contained"
@@ -209,70 +201,100 @@ const AddStudent = props => {
           </label>
           <label htmlFor="desc">
           <h4>Краткое описание:</h4>
-          <textarea
-            placeholder="Описание товара..."
-            name="desc"
-            onChange={onChangeHandler}
-            className="Add-Student-Input"
-            required
-            minLength="3"
-            maxLength="255"
+          <TextField
             id="desc"
+            name="desc"
+            label="Категория, название товара и т.д."
+            multiline
+            rows={4}
+            variant="outlined"
+            required
+            InputProps={{
+              inputProps: { 
+                value: info.desc,
+                minLength: "3", 
+                maxLength: "255"
+              }
+            }}
+            onChange={onChangeHandler}
           />
           </label>
           <label htmlFor="countAll">
           <h4>Всего на складе: </h4>
-          <input
-            type="number"
-            placeholder="0 до 120"
-            name="countAll"
-            min="0"
-            max="120"
-            onChange={onChangeHandler}
-            className="Add-Student-Input"
-            required
+          <TextField 
             id="countAll"
+            type="number"
+            name="countAll"
+            label="0 до 120" 
+            variant="outlined" 
+            required
+            InputProps={{
+              inputProps: { 
+                value: info.countAll,
+                min: info.sold,
+                max: 120,
+              }
+            }}
+            onChange={onChangeHandler}
           />
           </label>
           <label htmlFor="sold">
           <h4>Продано: </h4>
-          <input
-            type="number"
-            placeholder="0 до 120"
-            name="sold"
-            min="0"
-            max="120"
-            onChange={onChangeHandler}
-            className="Add-Student-Input"
-            required
+          <TextField 
             id="sold"
+            type="number"
+            name="sold"
+            label="0 до 120" 
+            variant="outlined" 
+            required
+            InputProps={{
+              inputProps: { 
+                value: info.sold,
+                min: 0,
+                max: info.countAll,
+              }
+            }}
+            onChange={onChangeHandler}
           />
           </label>
           <label htmlFor="remind" >
           <h4>Остаток: </h4>
-          <input
-            type="number"
-            placeholder="0 от 120"
-            name="remind"
-            min="0"
-            max="120"
-            onChange={onChangeHandler}
-            className="Add-Student-Input"
-            required
+          <TextField 
+            readOnly={true}
             id="remind"
+            type="number"
+            name="remind"
+            label="0 до 120" 
+            variant="outlined" 
+            required
+            InputProps={{
+              inputProps: { 
+                value: info.remind,
+                min: 0,
+                max: 120,
+              }
+            }}
+            onChange={onChangeHandler}
           />
           </label>
           <label htmlFor="notes">
           <h4>Примечание: </h4>
-          <textarea
-            placeholder="Примечание к товару..."
-            name="notes"
-            onChange={onChangeHandler}
-            className="Add-Student-Input"
-            required
-            minLength="3"
-            maxLength="255"
+          <TextField
             id="notes"
+            name="notes"
+            label="Добавьте сюда номер штрихкода"
+            multiline
+            rows={4}
+            variant="outlined"
+            required
+            InputProps={{
+              inputProps: { 
+                value: info.notes,
+                minLength: "3", 
+                maxLength: "255"
+              }
+            }}
+            onChange={onChangeHandler}
           />
           </label>
           <div className="Add-Student-Form-Buttons">
@@ -287,14 +309,14 @@ const AddStudent = props => {
               Добавить
             </Button>
             <Button
-            type="reset"
-            onClick={resetForm}
-            variant="contained"
-            color="secondary"
-            className={classes.button}
-            startIcon={<RotateLeftRoundedIcon />}
+              type="reset"
+              onClick={resetForm}
+              variant="contained"
+              color="secondary"
+              className={classes.button}
+              startIcon={<RotateLeftRoundedIcon />}
             >
-            Сбросить
+              Сбросить
             </Button>
           </div>
         </form>

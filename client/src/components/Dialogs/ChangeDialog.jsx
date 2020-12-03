@@ -1,6 +1,5 @@
 import React, { Fragment, useEffect } from 'react';
 import Button from '@material-ui/core/Button';
-import BorderColorIcon from '@material-ui/icons/BorderColor';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -28,7 +27,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-export default function ChangeDialog(props) {
+const ChangeDialog = props => {
     const classes = useStyles();
     const [open, setOpen] = React.useState(true);
     const [item, setItem] = React.useState('');
@@ -37,7 +36,8 @@ export default function ChangeDialog(props) {
     );
 
   const handleClose = e => {
-    setOpen(false);
+    props.onShow(false)
+    setOpen(false)
   };
 
   const handleChange = (event) => {
@@ -66,7 +66,7 @@ export default function ChangeDialog(props) {
   return (
     <Fragment>
       <Dialog
-        open={true}
+        open={open}
         onClose={handleClose}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
@@ -106,3 +106,5 @@ export default function ChangeDialog(props) {
     </Fragment>
   );
 }
+
+export default ChangeDialog

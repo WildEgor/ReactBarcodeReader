@@ -3,7 +3,7 @@ import chroma from 'chroma-js'
 const scannerSettings = {
     wrapper: {
         display: "flex",
-        flexDirection: "row",
+        flexDirection: "column",
         margin: "0 auto"
     }
 }
