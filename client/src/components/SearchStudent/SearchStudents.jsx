@@ -115,6 +115,7 @@ const SearchStudents = props => {
     </FormControl>
     <div style={{display: "flex", flexDirection: "row"}}>
       <InputBase
+        type="search"
         value={value}
         name="searchField"
         onChange={ handleChange }

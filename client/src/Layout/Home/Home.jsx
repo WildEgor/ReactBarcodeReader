@@ -51,7 +51,7 @@ class Home extends Component {
     
 
     let students = this.state.data.students.filter(item => {
-      return (item[query].toLowerCase().includes(username.toLowerCase()))
+      return (item[query].toLowerCase().includes(username.toLowerCase()) && item[query].length === username.length)
     } 
     );
 

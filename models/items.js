@@ -25,7 +25,7 @@ const itemsSchema = new mongoose.Schema({
     type: Number,
     required: true,
     validate: [
-      dateValidator,
+      soldValidator,
       "Invalid values"
     ],
     min: 0,
@@ -34,6 +34,10 @@ const itemsSchema = new mongoose.Schema({
   remind: {
     type: Number,
     required: true,
+    validate: [
+      remindValidator,
+      "Invalid values"
+    ],
     min: 0,
     max: 120
   },
@@ -46,10 +50,12 @@ const itemsSchema = new mongoose.Schema({
   },
 });
 
-// function that validate the startDate and endDate
-function dateValidator(value) {
-  // `this` is the mongoose document
+function soldValidator(value) {
   return this.countAll >= value;
+}
+
+function remindValidator(value) {
+  return value == this.countAll - this.sold;
 }
 
 itemsSchema.set('validateBeforeSave', true);

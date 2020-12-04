@@ -1,10 +1,13 @@
-import React, { useState, useEffect } from "react";
 import './AddStudent.css';
+
+import React, { useState, useEffect, Fragment } from "react";
 import axios from "axios";
-import {toast, ToastContainer} from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 import { withRouter } from "react-router-dom";
+
+import ChangeDialog from '../Dialogs/ChangeDialog'
 
 import Button from '@material-ui/core/Button';
 import SaveIcon from '@material-ui/icons/Save';
@@ -13,10 +16,10 @@ import RotateLeftRoundedIcon from '@material-ui/icons/RotateLeftRounded';
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 
-import ChangeDialog from '../Dialogs/ChangeDialog'
-
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Backdrop from '@material-ui/core/Backdrop';
+
+import Formik from '../Forma/Formik'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -25,12 +28,12 @@ const useStyles = makeStyles((theme) => ({
       marginLeft: theme.spacing(2),
     },
     backdrop: {
-      zIndex: theme.zIndex.drawer + 999,
+      zIndex: theme.zIndex.drawer,
       color: '#fff',
     },
   },
   button: {
-    margin: theme.spacing(0.5),
+    margin: theme.spacing(1),
     padding: 'auto'
   },
   progress: {
@@ -54,32 +57,6 @@ const AddStudent = props => {
     response: ""
   })
 
-  const onChangeHandler = e => {
-    let inputValue = e.target.value
-    let inputName = e.target.name
-    setInfo(oldObject => {
-      let newObject = {...oldObject}
-      newObject[inputName] = inputValue
-      newObject = checkInputs(newObject)
-      return newObject
-    });
-  }
-
-  const checkInputs = formValues => {
-    formValues.remind = formValues.countAll - formValues.sold
-    if (formValues.remind < 0)
-      formValues.remind = 0
-    return formValues
-  }
-
-  const resetForm = () => {
-    setInfo(item => {
-      let newItem = {...item}
-      for(let prop in newItem){ newItem[prop] = "" }
-      return newItem
-    }) 
-  }
-
   const addStudent = e => {
     e.preventDefault();
     searchItems('articul').then(
@@ -100,14 +77,13 @@ const AddStudent = props => {
               "Товар " + newStudent.data.newStudent.articul + " успешно добавлен" ,
               { type: toast.TYPE.SUCCESS, 
                 autoClose: 3000,
-                onClose:  resetForm
+                //onClose:  resetForm
               })
           } catch(err) {
             toast(err.message ,{ type: toast.TYPE.ERROR, autoClose: 3000 });
           }
         } else {
             setItemList(itemList)
-            console.log('Smt found', itemList)
             setShowDialog(true)
         }
       }
@@ -122,7 +98,6 @@ const AddStudent = props => {
         if (isExist) {
           setItemList(itemList)
           setShowDialog(true)
-          console.log('Smt found', itemList)
         } else {
             toast("Такого товара еще нет на складе!" ,{ type: toast.TYPE.SUCCESS, autoClose: 3000, position: "top-center" });
         }
@@ -159,169 +134,130 @@ const AddStudent = props => {
     }
   }, [])
 
+  const formSchema = {
+    fields: {
+      articul: {
+        type: "text",
+        label: "Артикул",
+        placeholder: "Артикул",
+        options: {
+          required: true,
+        },
+        inputProps: { 
+          minLength: "3", 
+          maxLength: "255"
+        }
+      },
+      desc: {
+        type: "text",
+        label: "Краткое описание",
+        placeholder: "Краткое описание",
+        options: {
+          required: true,
+          multiline: true, 
+          rows: 4
+        },
+        inputProps: { 
+          minLength: "3", 
+          maxLength: "255"
+        }
+      },
+      countAll: {
+        type: "number",
+        label: "Всего на складе",
+        placeholder: "0",
+        options: {
+          required: true,
+        },
+        inputProps: { 
+          min: 0, 
+          max: 120
+        }
+      },
+      sold: {
+        type: "number",
+        label: "Всего продано",
+        placeholder: "0",
+        options: {
+          required: true,
+        },
+        inputProps: {
+          min: 0, 
+          max: 120
+        }
+      },
+      remind: {
+        type: "number",
+        label: "Остаток",
+        placeholder: "0",
+        options: {
+          required: true,
+        },
+        inputProps: {  
+          min: 0, 
+          max: 120
+        }
+      },
+      notes: {
+        type: "text",
+        label: "Примечание",
+        placeholder: "Номер штрихкода",
+        options: {
+          required: true,
+          multiline: true, 
+          rows: 4
+        },
+        inputProps: { 
+          minLength: "3", 
+          maxLength: "255"
+        }
+      }
+    },
+    buttons: {
+      submit: {
+        type: "submit",
+        label: "Добавить",
+        options: {
+          variant: "contained",
+          color: "primary",
+          size: "small",
+          className: classes.button,
+          startIcon: <SaveIcon />
+        },
+      },
+      reset: {
+        type: "reset",
+        label: "Сбросить",
+        options: {
+          variant: "contained",
+          color: "secondary",
+          size: "small",
+          className: classes.button,
+          startIcon: <RotateLeftRoundedIcon />,
+        },
+      }
+    }
+  }
+
     return (
-      <div className='AddStudent-Wrapper'>
+      <div className="AddStudent-Wrapper">
         {isFound?
         <Backdrop className={classes.backdrop} open={isFound} >
           <CircularProgress className={classes.progress} />
         </Backdrop>
         : null}
         {showDialog? <ChangeDialog itemsList={itemList} info={info} onShow={setShowDialog} /> : null}
-        <h1>Добавить товар:</h1>
-        <form onSubmit={addStudent} className="Add-Student-Form">
-          <label htmlFor="articul">
-          <h4>Артикул:</h4>
-          <div className="Add-Student-Input-Search">
-          <TextField 
-            id="articul"
-            name="articul"
-            label="Артикул" 
-            variant="outlined" 
-            className="Add-Student-Input"
-            required
-            InputProps={{
-              inputProps: { 
-                value: info.articul,
-                minLength: "3", 
-                maxLength: "255"
-              }
-            }}
-            onChange={onChangeHandler}
-          />
-          <Button
-            variant="contained"
-            color="primary"
-            size="small"
-            onClick={() => {quickSearch('articul')}}
-            className={classes.button}
-            startIcon={<SearchIcon />}
-          >
-          </Button>
-          </div>
-          </label>
-          <label htmlFor="desc">
-          <h4>Краткое описание:</h4>
-          <TextField
-            id="desc"
-            name="desc"
-            label="Категория, название товара и т.д."
-            multiline
-            rows={4}
-            variant="outlined"
-            required
-            InputProps={{
-              inputProps: { 
-                value: info.desc,
-                minLength: "3", 
-                maxLength: "255"
-              }
-            }}
-            onChange={onChangeHandler}
-          />
-          </label>
-          <label htmlFor="countAll">
-          <h4>Всего на складе: </h4>
-          <TextField 
-            id="countAll"
-            type="number"
-            name="countAll"
-            label="0 до 120" 
-            variant="outlined" 
-            required
-            InputProps={{
-              inputProps: { 
-                value: info.countAll,
-                min: info.sold,
-                max: 120,
-              }
-            }}
-            onChange={onChangeHandler}
-          />
-          </label>
-          <label htmlFor="sold">
-          <h4>Продано: </h4>
-          <TextField 
-            id="sold"
-            type="number"
-            name="sold"
-            label="0 до 120" 
-            variant="outlined" 
-            required
-            InputProps={{
-              inputProps: { 
-                value: info.sold,
-                min: 0,
-                max: info.countAll,
-              }
-            }}
-            onChange={onChangeHandler}
-          />
-          </label>
-          <label htmlFor="remind" >
-          <h4>Остаток: </h4>
-          <TextField 
-            readOnly={true}
-            id="remind"
-            type="number"
-            name="remind"
-            label="0 до 120" 
-            variant="outlined" 
-            required
-            InputProps={{
-              inputProps: { 
-                value: info.remind,
-                min: 0,
-                max: 120,
-              }
-            }}
-            onChange={onChangeHandler}
-          />
-          </label>
-          <label htmlFor="notes">
-          <h4>Примечание: </h4>
-          <TextField
-            id="notes"
-            name="notes"
-            label="Добавьте сюда номер штрихкода"
-            multiline
-            rows={4}
-            variant="outlined"
-            required
-            InputProps={{
-              inputProps: { 
-                value: info.notes,
-                minLength: "3", 
-                maxLength: "255"
-              }
-            }}
-            onChange={onChangeHandler}
-          />
-          </label>
-          <div className="Add-Student-Form-Buttons">
-            <Button
-              type="submit"
-              variant="contained"
-              color="primary"
-              size="small"
-              className={classes.button}
-              startIcon={<SaveIcon />}
-            >
-              Добавить
-            </Button>
-            <Button
-              type="reset"
-              onClick={resetForm}
-              variant="contained"
-              color="secondary"
-              className={classes.button}
-              startIcon={<RotateLeftRoundedIcon />}
-            >
-              Сбросить
-            </Button>
-          </div>
-        </form>
+         <h1>Добавить товар:</h1>
+         <Formik formSchema={ formSchema } defValues={ info } onSubmit={ addStudent } updateData={(item) => { 
+           setInfo(oldObject => {
+                let newObject = {...oldObject}
+                newObject[item.name] = item.value
+                return newObject
+              });
+          }} />
         <ToastContainer />
       </div>
+      
     );
 }
 
