@@ -19,7 +19,7 @@ import TextField from '@material-ui/core/TextField';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Backdrop from '@material-ui/core/Backdrop';
 
-import Formik from '../Forma/Formik'
+import AutoForma from '../Forma/AutoForma';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -57,8 +57,12 @@ const AddStudent = props => {
     response: ""
   })
 
+  useEffect(() => {
+    console.log('Current info data is ', info)
+  }, [info])
+
   const addStudent = e => {
-    e.preventDefault();
+    //e.preventDefault();
     searchItems('articul').then(
       async (itemList) => {
         setIsFound(false)
@@ -134,109 +138,67 @@ const AddStudent = props => {
     }
   }, [])
 
-  const formSchema = {
-    fields: {
+  const schema = {
+    title: "Test form",
+    type: "object",
+    properties: {
       articul: {
-        type: "text",
-        label: "Артикул",
-        placeholder: "Артикул",
-        options: {
-          required: true,
-        },
-        inputProps: { 
-          minLength: "3", 
-          maxLength: "255"
-        }
+        type: "string",
+        title: "Артикул",
+        minLength: 3,
+        maxLength: 255
       },
       desc: {
-        type: "text",
-        label: "Краткое описание",
-        placeholder: "Краткое описание",
-        options: {
-          required: true,
-          multiline: true, 
-          rows: 4
-        },
-        inputProps: { 
-          minLength: "3", 
-          maxLength: "255"
-        }
+        type: "string",
+        title: "Краткое описание",
+        minLength: 3,
+        maxLength: 255
       },
       countAll: {
         type: "number",
-        label: "Всего на складе",
-        placeholder: "0",
-        options: {
-          required: true,
-        },
-        inputProps: { 
-          min: 0, 
-          max: 120
-        }
+        title: "Всего на складе",
+        minimum: 0,
+        maximum : 120
       },
       sold: {
         type: "number",
-        label: "Всего продано",
-        placeholder: "0",
-        options: {
-          required: true,
-        },
-        inputProps: {
-          min: 0, 
-          max: 120
-        }
+        title: "Продано",
+        min: 0,
+        max: 120
       },
       remind: {
         type: "number",
-        label: "Остаток",
-        placeholder: "0",
-        options: {
-          required: true,
-        },
-        inputProps: {  
-          min: 0, 
-          max: 120
-        }
+        title: "Остаток",
+        min: 0,
+        max: 120
       },
       notes: {
-        type: "text",
-        label: "Примечание",
-        placeholder: "Номер штрихкода",
-        options: {
-          required: true,
-          multiline: true, 
-          rows: 4
-        },
-        inputProps: { 
-          minLength: "3", 
-          maxLength: "255"
-        }
-      }
-    },
-    buttons: {
-      submit: {
-        type: "submit",
-        label: "Добавить",
-        options: {
-          variant: "contained",
-          color: "primary",
-          size: "small",
-          className: classes.button,
-          startIcon: <SaveIcon />
-        },
-      },
-      reset: {
-        type: "reset",
-        label: "Сбросить",
-        options: {
-          variant: "contained",
-          color: "secondary",
-          size: "small",
-          className: classes.button,
-          startIcon: <RotateLeftRoundedIcon />,
-        },
+        type: "string",
+        title: "Примечание",
+        minLength: 3,
+        maxLength: 255
       }
     }
+  }; 
+
+  const formInitData = {
+    articul: "123",
+  };
+
+  const validate = (formData, errors) => {
+    if (formData.countAll < formData.sold) {
+        errors.countAll.addError("Ошибка при вводе значений");
+    }
+    return errors;
+  }
+
+  const autoComplete = (formData) => {
+    if (formData.countAll < formData.sold){
+      formData.sold = formData.countAll
+      formData.countAll =  formData.sold
+    }
+    formData.remind = formData.countAll - formData.sold
+    return formData
   }
 
     return (
@@ -247,14 +209,7 @@ const AddStudent = props => {
         </Backdrop>
         : null}
         {showDialog? <ChangeDialog itemsList={itemList} info={info} onShow={setShowDialog} /> : null}
-         <h1>Добавить товар:</h1>
-         <Formik formSchema={ formSchema } defValues={ info } onSubmit={ addStudent } updateData={(item) => { 
-           setInfo(oldObject => {
-                let newObject = {...oldObject}
-                newObject[item.name] = item.value
-                return newObject
-              });
-          }} />
+          <AutoForma schema={ schema } formInitData={ formInitData } onSubmitData={ addStudent } addFunc={ autoComplete } validateFunc={ validate }></AutoForma>
         <ToastContainer />
       </div>
       
