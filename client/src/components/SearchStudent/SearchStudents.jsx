@@ -56,6 +56,9 @@ const SearchStudents = props => {
   const [value, setValue] = useState("")
   const [isFound, setIsFound] = useState(true)
 
+  useEffect(() => {
+    console.log(searchItem)
+  }, [searchItem])
   // 
   const handleChange = e => {
     console.log(e.target.value)
@@ -128,7 +131,10 @@ const SearchStudents = props => {
             to={
               { 
                   pathname: "/add",
-                  query : value
+                  query : {
+                    type: searchItem,
+                    value: value 
+                  }
               }
             } 
           className="Add-Button">

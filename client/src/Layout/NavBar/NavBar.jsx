@@ -21,7 +21,7 @@ const Home = () => {
         transform: 'translateX(16px)',
         color: theme.palette.common.white,
         '& + $track': {
-          backgroundColor: '#6952d8',
+          backgroundColor: '#ffc107',
           opacity: 1,
           border: 'none',
         },

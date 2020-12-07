@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import "./Home.css";
 import axios from "axios";
-import { PropagateLoader } from 'react-spinners';
+import { PuffLoader } from 'react-spinners';
 // Components
 import HomeTable from "../../components/HomeTable/HomeTable"
 import SearchStudents from "../../components/SearchStudent/SearchStudents";
@@ -48,8 +48,6 @@ class Home extends Component {
     let isFound = false;
     if (this.state.allStudents === null) this.setState({ allStudents });
 
-    
-
     let students = this.state.data.students.filter(item => {
       return (item[query].toLowerCase().includes(username.toLowerCase()) && item[query].length === username.length)
     } 
@@ -72,7 +70,7 @@ class Home extends Component {
 
   render(){
     if (!this.state.data)
-      return <div className="Spinner-Wrapper"> <PropagateLoader color={'#333'} /> </div>;
+      return <div className="Spinner-Wrapper"> <PuffLoader size={"100"} color={'#333'} /> </div>;
 
     if (this.state.error) return <h1>{this.state.error}</h1>;
       if (!this.state.data.students.length)

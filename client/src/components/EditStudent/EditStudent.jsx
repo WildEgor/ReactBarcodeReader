@@ -4,16 +4,34 @@ import axios from "axios";
 import { withRouter } from 'react-router'
 import {toast, ToastContainer} from "react-toastify";
 
-import Button from '@material-ui/core/Button';
-import SaveIcon from '@material-ui/icons/Save';
+import AutoForma from '../Forma/AutoForma';
+
+import CircularProgress from '@material-ui/core/CircularProgress';
+
 import { makeStyles } from '@material-ui/core/styles';
+import SaveIcon from '@material-ui/icons/Save';
+
+import { schema, uiSchema} from '../TableSchema/TableSchema'
 
 const useStyles = makeStyles((theme) => ({
-  button: {
-    margin: theme.spacing(0.5),
+  buttonAdd: {
+    margin: theme.spacing(1),
     padding: 'auto',
-    backgroundColor: "orange",
-    color: "black"
+    backgroundColor: "rgba(78,163,61, 1.0)",
+    color: "white",
+    "&:hover": {
+        backgroundColor: "rgba(78,163,61, 0.6)"
+    },
+  },
+  buttonReset: {
+    display: "none",
+    margin: theme.spacing(1),
+    padding: 'auto',
+    backgroundColor: "rgba(190,98,61, 1.0)",
+    color: "white",
+    "&:hover": {
+        backgroundColor: "rgba(190,98,61, 0.6)"
+    }
   },
 }));
 
@@ -29,81 +47,56 @@ const EditStudent = props => {
     notes: "",
     response: ""
   })
-  const [oldInfo, setOldInfo] = useState({
-    id: '',
-    articul: "",
-    desc: "",
-    countAll: "",
-    sold: "",
-    remind: "",
-    notes: "",
-  })
-  const [forma, setForma] = useState()
 
-  const onChangeHandler = e => {
-    let inputValue = e.target.value
-    let inputName = e.target.name
-    setInfo(oldObject => {
-      let newObject = {...oldObject}
-      newObject[inputName] = inputValue
-      newObject = checkInputs(newObject)
-      return newObject
-    });
-  }
+  const [formUpdate, setFormUpdate] = useState()
 
-  const checkInputs = formValues => {
-    if (parseInt(formValues.sold) > parseInt(formValues.countAll)){
-      formValues.sold = formValues.countAll
-    }
-    formValues.remind = formValues.countAll - formValues.sold
-
-    forma.formInputs.forEach(item => {
-      if (item.name == 'sold')
-        item.value = formValues.sold
-      if (item.name == 'countAll')
-        item.value = formValues.countAll
-      if (item.name == 'remind')
-        item.value = formValues.countAll - formValues.sold
-    })
-    return formValues
-  }
-
-  const getForm = () => {
-    const form = document.querySelector('.Edit-Student-Form')
-    let formInputs = Array.from(form.getElementsByTagName("input"));
-    let formTextarea = Array.from(form.getElementsByTagName("textarea"));
-    return {formInputs, formTextarea}
+  const firstSearch = async () => {
+    try {
+      let search =  props.location.search,
+      id = search.substring(1, search.length);
+      const updateStudent = await axios(`/api/items/${id}`);
+      const { articul, desc, countAll, sold, remind, notes } = updateStudent.data.student;
+      setInfo({ id, articul, desc, countAll, sold, remind, notes  });
+      renderForm({ id, articul, desc, countAll, sold, remind, notes  })
+      return { id, articul, desc, countAll, sold, remind, notes  }
+      } catch (err) {
+        setInfo({ response: "Товар не найден!" })
+      }
   }
 
   useEffect(() => {
-    let { formInputs, formTextarea } = getForm(); 
-    setForma({ formInputs, formTextarea })
-
-    async function firstSearch() {
-      try {
-        let search =  props.location.search,
-        id = search.substring(1, search.length);
-        const updateStudent = await axios(`/api/items/${id}`);
-        const { articul, desc, countAll, sold, remind, notes } = updateStudent.data.student;
-        setInfo({ id, articul, desc, countAll, sold, remind, notes  });
-        setOldInfo({ id, articul, desc, countAll, sold, remind, notes  });
-        } catch (err) {
-          setInfo({ response: "Товар не найден!" })
-        }
-    }
-    firstSearch();
+    firstSearch()
   }, [])
 
-  const updateStudentHandler = async (e) => {
+  const autoComplete = formData => {
+    formData.remind = formData.countAll - formData.sold
+    return formData
+  }
+
+  const renderForm = (formInitData) => {
+    setFormUpdate (
+      <AutoForma 
+          schema={ schema } 
+          formInitData={ formInitData } 
+          uiSchema={ {...uiSchema, "ui:title": "Изменить товар"} } 
+          addFunc = { formdata => {return formdata}}
+          onSubmitData={ updateStudentHandler } 
+          validateFunc={ validate }
+          mUIClasses={ classes }
+      />
+    )
+  }
+
+  const updateStudentHandler = async (e, data) => {
     e.preventDefault();
     try {
-      const student = await axios.put(`/api/items/${info.id}`, {
-          articul: info.articul,
-          desc: info.desc,
-          countAll: info.countAll,
-          sold: info.sold,
-          remind: info.remind,
-          notes: info.notes
+      const student = await axios.put(`/api/items/${data.id}`, {
+          articul: data.articul,
+          desc: data.desc,
+          countAll: data.countAll,
+          sold: data.sold,
+          remind: data.remind,
+          notes: data.notes
       });
       toast(student.data.message ,{ type: toast.TYPE.INFO, autoClose: 3000 });
 
@@ -112,110 +105,17 @@ const EditStudent = props => {
     }
   };
 
+  const validate = (formData, errors) => {
+    if (formData.countAll < formData.sold) 
+        errors.countAll.addError("Ошибка при вводе значений");
+    return errors;
+  }
+
   return (
         // (info.response === "Товар не найден!")? <h1>Товар не найден!</h1> :
       <div className="Edit-Student-Wrapper">
-        <h1>Изменить товар</h1>
-          <form onSubmit={this.updateStudentHandler} className="Edit-Student-Form">
-          <label htmlFor="articul">
-          <h4>Артикул:</h4>
-          <input
-            type="text"
-            placeholder="Артикул..."
-            value={ info.articul }
-            name="articul"
-            onChange={onChangeHandler}
-            required
-            className="Edit-Student-Input"
-            id="articul"
-          />
-          </label>
-          <label htmlFor="desc" style={{display: "flex", flexDirection: "column"}}>
-          <h4>Краткое описание:</h4>
-          <textarea
-            style={{resize: "vertical"}}
-            placeholder="Описание товара..."
-            value={ info.desc }
-            name="desc"
-            onChange={onChangeHandler}
-            required
-            minLength="3"
-            maxLength="255"
-            className="Edit-Student-Input"
-            id="desc"
-          />
-          </label>
-          <label htmlFor="countAll"> 
-          <h4>Всего на складе:</h4>
-          <input
-            type="number"
-            placeholder="0 до 120"
-            value={ info.countAll }
-            name="countAll"
-            min="0"
-            max="120"
-            required
-            onChange={onChangeHandler}
-            className="Edit-Student-Input"
-            id="countAll"
-          />
-          </label>
-          <label htmlFor="sold">
-          <h4>Продано:</h4> 
-          <input
-            type="number"
-            placeholder="0 до 120"
-            value={ info.sold }
-            name="sold"
-            min="0"
-            max="120"
-            required
-            onChange={onChangeHandler}
-            className="Edit-Student-Input"
-            id="sold"
-          />
-          </label>
-          <label htmlFor="remind">
-          <h4>Остаток:</h4> 
-          <input
-            type="number"
-            placeholder="0 до 120"
-            value={ info.remind }
-            name="remind"
-            min="0"
-            max="120"
-            required
-            onChange={onChangeHandler}
-            className="Edit-Student-Input"
-            id="remind"
-          />
-          </label>
-          <label htmlFor="notes" style={{display: "flex", flexDirection: "column"}}>
-          <h4>Примечание:</h4>
-          <textarea
-            style={{resize: "vertical"}}
-            placeholder="Примечание к товару..."
-            value={ info.notes }
-            name="notes"
-            onChange={onChangeHandler}
-            required
-            className="Edit-Student-Input"
-            id="notes"
-          />
-          </label>
-          <div className="Edit-Student-Form-Buttons">
-            <Button
-                onClick={updateStudentHandler}
-                variant="contained"
-                color="primary"
-                size="small"
-                className={classes.button}
-                startIcon={<SaveIcon />}
-              >
-                Обновить
-              </Button>
-            </div>
-        </form>
+        { !formUpdate? <CircularProgress /> : null}
+        { formUpdate }
         <ToastContainer />
       </div>
   )

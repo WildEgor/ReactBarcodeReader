@@ -29,6 +29,7 @@ const useStyles = makeStyles((theme) => ({
 
 const ChangeDialog = props => {
     const classes = useStyles();
+    const { onShow, itemsList } = props
     const [open, setOpen] = React.useState(true);
     const [item, setItem] = React.useState('');
     const[itemLs, setItemLs] = React.useState(
@@ -36,7 +37,7 @@ const ChangeDialog = props => {
     );
 
   const handleClose = e => {
-    props.onShow(false)
+    onShow(false)
     setOpen(false)
   };
 
@@ -45,7 +46,7 @@ const ChangeDialog = props => {
   };
 
   const renderMenuItems = () => {
-    const listItems = props.itemsList.map((item) => {
+    const listItems = itemsList.map((item) => {
         return(
             <MenuItem value={item._id} key={item._id.toString()}>{item.articul} | {item.desc}</MenuItem>
         )
@@ -73,7 +74,7 @@ const ChangeDialog = props => {
       >
         <DialogTitle id="alert-dialog-title">{`Изменить запись`}</DialogTitle>
         <DialogContent>
-          <Badge className={classes.margin} color="primary" badgeContent={Array.from(props.itemsList).length} max={999} {...defaultProps} />
+          <Badge className={classes.margin} color="primary" badgeContent={Array.from(itemsList).length} max={999} {...defaultProps} />
           <DialogContentText id="alert-dialog-description">
             {`Выбрать запись:`}
           </DialogContentText>

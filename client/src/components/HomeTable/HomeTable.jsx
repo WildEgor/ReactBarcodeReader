@@ -51,7 +51,7 @@ const useStyles = makeStyles({
         let labelList = {
             articul: 'Артикул',
             desc: 'Краткое описание',
-            countall: 'Всего на складе',
+            countall: 'Всего',
             sold: 'Продано',
             remind: 'Остаток',
             notes: 'Примечание'

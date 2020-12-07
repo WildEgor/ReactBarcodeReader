@@ -9,17 +9,13 @@ import { withRouter } from "react-router-dom";
 
 import ChangeDialog from '../Dialogs/ChangeDialog'
 
-import Button from '@material-ui/core/Button';
-import SaveIcon from '@material-ui/icons/Save';
-import SearchIcon from '@material-ui/icons/Search';
-import RotateLeftRoundedIcon from '@material-ui/icons/RotateLeftRounded';
 import { makeStyles } from '@material-ui/core/styles';
-import TextField from '@material-ui/core/TextField';
 
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Backdrop from '@material-ui/core/Backdrop';
 
 import AutoForma from '../Forma/AutoForma';
+import { schema, uiSchema} from '../TableSchema/TableSchema'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -38,7 +34,25 @@ const useStyles = makeStyles((theme) => ({
   },
   progress: {
     position: "absolute"
-  }
+  },
+  buttonAdd: {
+    margin: theme.spacing(1),
+    padding: 'auto',
+    backgroundColor: "rgba(78,163,61, 1.0)",
+    color: "white",
+    "&:hover": {
+        backgroundColor: "rgba(78,163,61, 0.6)"
+    }
+  },
+  buttonReset: {
+    margin: theme.spacing(1),
+    padding: 'auto',
+    backgroundColor: "rgba(190,98,61, 1.0)",
+    color: "white",
+    "&:hover": {
+        backgroundColor: "rgba(190,98,61, 0.6)"
+    }
+  },
 }));
 
 const AddStudent = props => {
@@ -47,35 +61,21 @@ const AddStudent = props => {
   const [itemList, setItemList] = useState([])
   const [isFound, setIsFound] = useState(false)
 
-  const [info, setInfo] = useState({
-    articul: "",
-    desc: "",
-    countAll: 0,
-    sold: 0,
-    remind: 0,
-    notes: "",
-    response: ""
-  })
-
-  useEffect(() => {
-    console.log('Current info data is ', info)
-  }, [info])
-
-  const addStudent = e => {
-    //e.preventDefault();
-    searchItems('articul').then(
+  const addStudent = (e, data) => {
+    e.preventDefault();
+    searchItems('articul', data).then(
       async (itemList) => {
         setIsFound(false)
         let isExist = itemList.length ? true : false;
         if (!isExist){
           try {
             let newStudent = await axios.post("/api/items", {
-              articul: info.articul,
-              desc: info.desc,
-              countAll: info.countAll,
-              sold: info.sold,
-              remind: info.remind,
-              notes: info.notes
+              articul: data.articul,
+              desc: data.desc,
+              countAll: data.countAll,
+              sold: data.sold,
+              remind: data.remind,
+              notes: data.notes
             })
             toast(
               "Товар " + newStudent.data.newStudent.articul + " успешно добавлен" ,
@@ -94,9 +94,9 @@ const AddStudent = props => {
     )
   };
 
-  const quickSearch = name => {
-    if (info[name]) {
-      searchItems(name).then( itemList => {
+  const quickSearch = (name, e, data) => {
+    if (data[name]) {
+      searchItems(name, data).then( itemList => {
         setIsFound(false)
         let isExist = itemList.length ? true : false;
         if (isExist) {
@@ -111,14 +111,14 @@ const AddStudent = props => {
     }
   }
 
-  const searchItems = async query => {
+  const searchItems = async (query, data) => {
+    console.log('Search data', query, data)
     try {
     setIsFound(true)
     const allStudents = await axios("/api/items/")
     let items = allStudents.data.students.filter(item => {
-      if (item[query].toLowerCase() !== info[query].toLowerCase()){
+      if (item[query].toLowerCase() !== data[query].toLowerCase())
         return false
-      }
       return true
     })
     return items
@@ -128,75 +128,27 @@ const AddStudent = props => {
     }
   }
 
-  useEffect(() => {
-    if (typeof props.location.query !== "undefined"){
-      setInfo(old => {
-        let newObj = {...old}
-        newObj.articul = props.location.query
-        return newObj
-      })
-    }
-  }, [])
+  const initFormData = () => {
+    let initData = {}
+    if (props.location.query)
+      initData[props.location.query.type] = props.location.query.value
+    return initData
+  }
 
-  const schema = {
-    title: "Test form",
-    type: "object",
-    properties: {
-      articul: {
-        type: "string",
-        title: "Артикул",
-        minLength: 3,
-        maxLength: 255
-      },
-      desc: {
-        type: "string",
-        title: "Краткое описание",
-        minLength: 3,
-        maxLength: 255
-      },
-      countAll: {
-        type: "number",
-        title: "Всего на складе",
-        minimum: 0,
-        maximum : 120
-      },
-      sold: {
-        type: "number",
-        title: "Продано",
-        min: 0,
-        max: 120
-      },
-      remind: {
-        type: "number",
-        title: "Остаток",
-        min: 0,
-        max: 120
-      },
-      notes: {
-        type: "string",
-        title: "Примечание",
-        minLength: 3,
-        maxLength: 255
-      }
-    }
-  }; 
-
-  const formInitData = {
-    articul: "123",
-  };
+  const initSchema = () => {
+    let mySchema = {...schema}
+    mySchema.title = "Добавить товар"
+    //console.log('mySchema', mySchema)
+    return( mySchema )
+  }
 
   const validate = (formData, errors) => {
-    if (formData.countAll < formData.sold) {
+    if (formData.countAll < formData.sold) 
         errors.countAll.addError("Ошибка при вводе значений");
-    }
     return errors;
   }
 
-  const autoComplete = (formData) => {
-    if (formData.countAll < formData.sold){
-      formData.sold = formData.countAll
-      formData.countAll =  formData.sold
-    }
+  const autoComplete = formData => {
     formData.remind = formData.countAll - formData.sold
     return formData
   }
@@ -208,8 +160,17 @@ const AddStudent = props => {
           <CircularProgress className={classes.progress} />
         </Backdrop>
         : null}
-        {showDialog? <ChangeDialog itemsList={itemList} info={info} onShow={setShowDialog} /> : null}
-          <AutoForma schema={ schema } formInitData={ formInitData } onSubmitData={ addStudent } addFunc={ autoComplete } validateFunc={ validate }></AutoForma>
+        {showDialog? <ChangeDialog itemsList={itemList} onShow={setShowDialog} /> : null}
+          <AutoForma 
+          schema={ schema } 
+          formInitData={ initFormData } 
+          uiSchema={ {...uiSchema, "ui:title": "Добавить товар"} } 
+          onSubmitData={ addStudent } 
+          addFunc={ autoComplete } 
+          quickSearchFunc={ quickSearch }
+          validateFunc={ validate }
+          mUIClasses={ classes }
+          />
         <ToastContainer />
       </div>
       
