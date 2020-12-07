@@ -2,7 +2,6 @@ import React, {Fragment, useState, useEffect } from "react";
 import { Link } from 'react-router-dom';
 import "./SearchStudents.css";
 
-import Button from '@material-ui/core/Button';
 import CreateIcon from '@material-ui/icons/Create';
 import { makeStyles } from '@material-ui/core/styles';
 
@@ -12,7 +11,7 @@ import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 
 import IconButton from '@material-ui/core/IconButton';
-import SearchIcon from '@material-ui/icons/Search';
+
 import Paper from '@material-ui/core/Paper';
 
 import InputBase from '@material-ui/core/InputBase';
@@ -52,7 +51,6 @@ const SearchStudents = props => {
   })
   const [searchItem, setSearchItem] = useState('articul')
   const [searchMenuItems, setSearchMenuItems] = useState()
-
   const [value, setValue] = useState("")
   const [isFound, setIsFound] = useState(true)
 
@@ -61,9 +59,10 @@ const SearchStudents = props => {
   }, [searchItem])
   // 
   const handleChange = e => {
-    console.log(e.target.value)
+    console.log(typeof props.table)
     setValue(e.target.value)
     letSearch(e.target.value)
+    //letSearch(e.target.value)
   }
 
   const handleSelectorChange = (event) => {
@@ -85,21 +84,22 @@ const SearchStudents = props => {
     renderMenuItems()
   }, [])
 
+  useEffect(() => {
+    if (typeof props.table !== "undefined")
+      letSearch(value)
+  }, [value])
+
   // Если что-то обнаружил сканнер, то 
   useEffect(() => {
     setValue(props.scannerSearch)
-    letSearch(props.scannerSearch)
+    //letSearch(props.scannerSearch)
   }, [props.scannerSearch])
 
   const letSearch = query => {
-    // Если ввели значение отличное от предыдущего (наверное это так будет работать :))
-    if (value !== query){
-      setValue(query)
-      let isFound = props.searchStudents(query, searchItem) // Передаем запрос к родителю и делаем поиск
-      isFound.then(resolve => setIsFound(resolve)) // Если найдено что-то устанавливаем флаг
-    } else {
-      setIsFound(false)
-    }
+    console.log('Search event')
+    setValue(query)
+    let isFound = props.searchStudents(query, searchItem) // Передаем запрос к родителю и делаем поиск
+    isFound.then(resolve => setIsFound(resolve)) // Если найдено что-то устанавливаем флаг
   }
 
   return (
@@ -110,10 +110,10 @@ const SearchStudents = props => {
       <Select
         labelId="demo-simple-select-label"
         id="demo-simple-select"
-        value={searchItem}
-        onChange={handleSelectorChange}
+        value={ searchItem }
+        onChange={ handleSelectorChange } 
       >
-        {searchMenuItems}
+        { searchMenuItems }
       </Select>
     </FormControl>
     <div style={{display: "flex", flexDirection: "row"}}>
@@ -138,7 +138,7 @@ const SearchStudents = props => {
               }
             } 
           className="Add-Button">
-            <IconButton className={classes.iconButton} aria-label="search" >
+            <IconButton className={ classes.iconButton } aria-label="search" >
               <CreateIcon />
             </IconButton>
           </Link>
