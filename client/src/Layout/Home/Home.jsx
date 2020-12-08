@@ -70,7 +70,7 @@ class Home extends Component {
 
   render(){
     if (!this.state.data)
-      return <div className="Spinner-Wrapper"> <PuffLoader size={"100"} color={'#333'} /> </div>;
+      return <div className="Spinner-Wrapper"> <PuffLoader size={"100px"} color={'#333'} /> </div>;
 
     if (this.state.error) return <h1>{this.state.error}</h1>;
       if (!this.state.data.students.length)

@@ -135,13 +135,6 @@ const AddStudent = props => {
     return initData
   }
 
-  const initSchema = () => {
-    let mySchema = {...schema}
-    mySchema.title = "Добавить товар"
-    //console.log('mySchema', mySchema)
-    return( mySchema )
-  }
-
   const validate = (formData, errors) => {
     if (formData.countAll < formData.sold) 
         errors.countAll.addError("Ошибка при вводе значений");

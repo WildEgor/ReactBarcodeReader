@@ -35,7 +35,7 @@ const useStyles = makeStyles({
     headCell: {
         backgroundColor: "rgb(0, 121, 107)",
         color: "white",
-        fontSize: "1.2rem"
+        fontSize: "1rem"
     }
   });
 
@@ -47,8 +47,8 @@ const useStyles = makeStyles({
     const [orderBy, setOrderBy] = React.useState('calories');
 
     const toNormalLabel = (propLabel) => {
-        let label = propLabel
-        let labelList = {
+        const label = propLabel
+        const labelList = {
             articul: 'Артикул',
             desc: 'Краткое описание',
             countall: 'Всего',
@@ -58,48 +58,49 @@ const useStyles = makeStyles({
         }
 
         for(let prop in labelList) {
-            if (propLabel.toLowerCase() == prop)
+            if (label.toLowerCase() == prop)
                 return labelList[prop]
         }
     }
 
     useEffect(() => {
-        let firstRow = props.table[0]
-        let arr = []
-        for (let prop in firstRow){
-            if (!prop.startsWith("_")){
-                if (typeof firstRow[prop] == "number"){
-                    arr.push({
-                        id: prop,
-                        label: toNormalLabel(prop),
-                        minWidth: 170,
-                        align: "center",
-                        format: (value) => value.toFixed(2) 
-                    })
-                } else {
-                    arr.push({
-                        id: prop,
-                        label: toNormalLabel(prop),
-                        minWidth: 170,
-                        align: "center",
-                        format: (value) => value.toLocaleString("en-US")
-                    })
+        if (typeof props.table !== "undefined"){
+            let firstRow = props.table[0]
+            let arr = []
+            for (let prop in firstRow){
+                if (!prop.startsWith("_")){
+                    if (typeof firstRow[prop] == "number"){
+                        arr.push({
+                            id: prop,
+                            label: toNormalLabel(prop),
+                            minWidth: 170,
+                            align: "center",
+                            format: (value) => value.toFixed(2) 
+                        })
+                    } else {
+                        arr.push({
+                            id: prop,
+                            label: toNormalLabel(prop),
+                            minWidth: 170,
+                            align: "center",
+                            format: (value) => value.toLocaleString("en-US")
+                        })
+                    }
                 }
             }
-        }
 
-        arr.unshift({
-            id: "changer",
-            label: "Действие",
-            minWidth: 170,
-        })
+            arr.unshift({
+                id: "changer",
+                label: "Действие",
+                minWidth: 170,
+            })
 
-        setColumns(oldCol => {
-            let newCol = [...oldCol]
-            newCol.splice(0, newCol.length, ...arr)
-            return newCol
-        })
-        
+            setColumns(oldCol => {
+                let newCol = [...oldCol]
+                newCol.splice(0, newCol.length, ...arr)
+                return newCol
+            })
+    }
     }, [props.table])
 
     const handleRequestSort = (event, property) => {

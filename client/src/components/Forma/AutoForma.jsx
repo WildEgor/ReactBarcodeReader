@@ -1,11 +1,26 @@
 import React, { Fragment, useState, useEffect } from "react";
 import { withTheme } from '@rjsf/core';
+import { makeStyles } from '@material-ui/core/styles';
 import { Theme as MaterialUITheme } from '@rjsf/material-ui';
 import Button from '@material-ui/core/Button';
 import SaveIcon from '@material-ui/icons/Save';
 import RotateLeftIcon from '@material-ui/icons/RotateLeft';
+import Paper from '@material-ui/core/Paper';
+
+const useStyles = makeStyles((theme) => ({
+    root: {
+        padding: '10px 30px',
+        display: 'flex',
+        flexDirection: "column",
+        justifyContent: "start",
+        alignItems: 'left',
+        width: "80vw",
+        margin: "15px 0 15px 0"
+      },
+}))
 
 const AutoForma = props => {
+    const classes = useStyles()
     const Form = withTheme(MaterialUITheme);
     const { schema, formInitData, onSubmitData, addFunc, quickSearchFunc, validateFunc, uiSchema, mUIClasses } = props
     const [ formData, setFormData] = useState(formInitData);
@@ -47,7 +62,7 @@ const AutoForma = props => {
       }
 
     return(
-        <Fragment>
+        <Paper component="form" className={classes.root} elevation={4}>
             <Form 
             schema={ schema }
             uiSchema={ uiSchema }
@@ -86,7 +101,7 @@ const AutoForma = props => {
                 </Button>
             </div>
             </Form>
-        </Fragment>
+        </Paper>
     )
 }
 
