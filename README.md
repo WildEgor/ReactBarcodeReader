@@ -1,4 +1,4 @@
-
-![alt text](https://github.com/WildEgor/ReactBarcodeReader/blob/main/client/images/Screenshot_1.png?raw=true)
-
-<img src="https://github.com/WildEgor/ReactBarcodeReader/blob/main/client/images/Screenshot_1.png" width="100" height="100">
+<img src="https://github.com/WildEgor/ReactBarcodeReader/blob/main/client/images/Screenshot_1.png" width="720" height="1480">
+<img src="https://github.com/WildEgor/ReactBarcodeReader/blob/main/client/images/Screenshot_2.png" width="720" height="1480">
+<img src="https://github.com/WildEgor/ReactBarcodeReader/blob/main/client/images/Screenshot_3.png" width="720" height="1480">
+<img src="https://github.com/WildEgor/ReactBarcodeReader/blob/main/client/images/Screenshot_4.png" width="720" height="1480">
