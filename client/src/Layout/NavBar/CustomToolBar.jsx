@@ -89,7 +89,7 @@ class CustomToolBar extends React.Component {
               <MenuIcon />
             </IconButton>
             <Typography className={classes.title} variant="h6" noWrap>
-              ControlLink
+              MERN APP
             </Typography>
             <div className={classes.grow} />
             <div className={classes.sectionDesktop}>

@@ -58,6 +58,9 @@ let schema = {
     countAll: {
         "ui: widget": "updown",
     },
+    remind: {
+      "ui:disabled": "true"
+    },
     desc:{
         "ui:widget": "textarea",
         "ui:help": "Категория товара, описание товара и пр."

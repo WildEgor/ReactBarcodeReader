@@ -128,24 +128,6 @@ const AddStudent = props => {
     }
   }
 
-  const initFormData = () => {
-    let initData = {}
-    if (props.location.query)
-      initData[props.location.query.type] = props.location.query.value
-    return initData
-  }
-
-  const validate = (formData, errors) => {
-    if (formData.countAll < formData.sold) 
-        errors.countAll.addError("Ошибка при вводе значений");
-    return errors;
-  }
-
-  const autoComplete = formData => {
-    formData.remind = formData.countAll - formData.sold
-    return formData
-  }
-
     return (
       <div className="AddStudent-Wrapper">
         {isFound?
@@ -156,12 +138,26 @@ const AddStudent = props => {
         {showDialog? <ChangeDialog itemsList={itemList} onShow={setShowDialog} /> : null}
           <AutoForma 
           schema={ schema } 
-          formInitData={ initFormData } 
+          formInitData={ () => {
+            const no = {}
+            if (props.location.query)
+              no[props.location.query.type] = props.location.query.value
+            return no
+          } } 
           uiSchema={ {...uiSchema, "ui:title": "Добавить товар"} } 
           onSubmitData={ addStudent } 
-          addFunc={ autoComplete } 
+          addFunc={ (formData) => {
+            if (formData.countAll < formData.sold)
+              formData.sold = formData.countAll
+            formData.remind = formData.countAll - formData.sold
+              return formData
+          } } 
           quickSearchFunc={ quickSearch }
-          validateFunc={ validate }
+          validateFunc={ (formData, errors) => {
+            if (formData.countAll < formData.sold) 
+              errors.countAll.addError("Ошибка при вводе значений");
+            return errors;
+          }}
           mUIClasses={ classes }
           />
         <ToastContainer />

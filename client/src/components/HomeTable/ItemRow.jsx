@@ -12,7 +12,7 @@ const useStyles = makeStyles((theme) => ({
     button: {
         margin: theme.spacing(1),
         '&:hover': {
-          backgroundColor: "purple",
+          backgroundColor: "green",
       }
     }
   }));

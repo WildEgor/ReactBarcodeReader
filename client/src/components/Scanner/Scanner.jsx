@@ -38,6 +38,10 @@ const useStyles = makeStyles((theme) => ({
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
+    },
+    itemBox: {
+        display: "flex",
+        justifyContent: "center"
     }
   }));
 
@@ -174,14 +178,16 @@ const Scanner = props => {
     
     return (
     
-        <Grid container spacing={20} className={classes.scanner}>
+        <Grid container spacing={2} className={classes.scanner}>
         <Paper elevation={3} className={classes.root}>
-            <Grid item className={classes.item} lg={10} xs={12}>
+            <Grid item className={classes.item} lg={10} sm={8} xs={12}>
                 <Box className="vieport-wrapper" color="text.primary"/>
                 <Box id="interactive" className="viewport"/>
             </Grid>
-            <Grid item className={classes.item} lg={2} xs={12}>
-                <ScannerSettings updateSettings={_shouldComponentUpdate} />
+            <Grid item className={classes.item} lg={2} sm={4} xs={12} >
+                <Box className={classes.itemBox}>
+                    <ScannerSettings updateSettings={_shouldComponentUpdate} />
+                </Box>
             </Grid>
         </Paper> 
     </Grid> 

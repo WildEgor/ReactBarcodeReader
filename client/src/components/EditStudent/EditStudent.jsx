@@ -79,7 +79,8 @@ const EditStudent = props => {
           schema={ schema } 
           formInitData={ formInitData } 
           uiSchema={ {...uiSchema, "ui:title": "Изменить товар"} } 
-          addFunc = { formdata => {return formdata}}
+          // addFunc = { formdata => {return formdata}}
+          addFunc = { autoComplete }
           onSubmitData={ updateStudentHandler } 
           validateFunc={ validate }
           mUIClasses={ classes }

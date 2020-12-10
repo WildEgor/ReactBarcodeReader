@@ -64,17 +64,17 @@ const ScannerSettings = props => {
         {value: "code_93_reader", label: "Code 93"}
         ],
         pathSize: [
-        {value: "x-small", label:"XSmall"}, 
-        {value: "small", label: "Small"},
-        {value: "medium", label: "Medium"},
-        {value: "large", label: "Large"},
-        {value: "x-large", label: "XLarge"},
+        {value: "x-small", label:"XS"}, 
+        {value: "small", label: "S"},
+        {value: "medium", label: "M"},
+        {value: "large", label: "L"},
+        {value: "x-large", label: "XL"},
         ],
         freq: [
-        {value: 1, label:"Very slow"}, 
-        {value: 5, label: "Slow"},
-        {value: 15, label: "Medium"},
-        {value: 20, label: "Fast"}
+        {value: 1, label:"1 к/с"}, 
+        {value: 5, label: "5 к/с"},
+        {value: 15, label: "15 к/с"},
+        {value: 20, label: "20 к/с"}
         ]
     } // Настройки для селекторов
 

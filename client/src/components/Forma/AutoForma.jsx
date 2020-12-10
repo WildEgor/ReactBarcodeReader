@@ -24,21 +24,18 @@ const AutoForma = props => {
     const Form = withTheme(MaterialUITheme);
     const { schema, formInitData, onSubmitData, addFunc, quickSearchFunc, validateFunc, uiSchema, mUIClasses } = props
     const [ formData, setFormData] = useState(formInitData);
+    const [ resetForm, setResetForm ] = useState(false)
 
     const log = (type) => console.log.bind(console, type);
 
-    useEffect(() => {
-        console.log("uiSchema", uiSchema)
-    }, [])
-
     const handleChange = e => {
-        console.log('e.formData old', e.formData)
-        e.formData = addFunc(e.formData)
-        console.log('e.formData new', e.formData)
-        console.log('e.formData cur', formData)
-        //if (e.formData.hasOwnProperty("articul"))
-            //quickSearchFunc('articul', e, e.formData)
+        addFunc(e.formData)
+        //e.formData = addFunc(e.formData)
     }
+
+    useEffect(() => {
+        //setFormData({articul : "test"})
+    }, [])
 
     function transformErrors(errors) {
         return errors.map(error => {
@@ -61,9 +58,14 @@ const AutoForma = props => {
         });
       }
 
+    useEffect(() => {
+
+    }, [resetForm])
+
     return(
         <Paper component="form" className={classes.root} elevation={4}>
-            <Form 
+            <Form
+            id={"create-item-form"} 
             schema={ schema }
             uiSchema={ uiSchema }
             formData={ formData }
@@ -96,6 +98,7 @@ const AutoForma = props => {
                     size="large"
                     className={mUIClasses.buttonReset}
                     startIcon={<RotateLeftIcon />}
+                    onClick={ () => { setResetForm(!resetForm) } }
                 >
                     {uiSchema["ui:title"].includes("Добавить")? "Сбросить": "Сбросить"}
                 </Button>
