@@ -1,6 +1,6 @@
-<p>You can find any items from db by values two main columns (serial number or barcode). Embedded barcode scanner. Add/update/delete operations with selected goods</p>
+<p>You can find any items from db by values two main columns (serial number or barcode). Embedded barcode scanner.</p>
 <p>P.S.: It's my first try in React. Peace :)</p>
-<p>I'm not finished yet, but right now it's looking like this:</p>
+<p>I'm not finished yet, but right now it's looking like this (of course with bugs):</p>
 <ul>
   <li>
     <p>Review all items</p>
