@@ -32,5 +32,10 @@
   </li>
   <li>
     <p>Also if added item exist appropriate dialog appear (change one or several items)</p>
+    <img src="https://github.com/WildEgor/ReactBarcodeReader/blob/main/client/images/S8.png" width="50%" height="50%">
+  </li>
+  <li>
+    <p>Last, but not least it's responsive</p>
+    <img src="https://github.com/WildEgor/ReactBarcodeReader/blob/main/client/images/S9.png" width="50%" height="50%">
   </li>
 </ul>
