@@ -30,4 +30,7 @@
     <p>Validate add/change form before send to db</p>
     <img src="https://github.com/WildEgor/ReactBarcodeReader/blob/main/client/images/S7.png" width="50%" height="50%">
   </li>
+  <li>
+    <p>Also if added item exist appropriate dialog appear (change one or several items)</p>
+  </li>
 </ul>
