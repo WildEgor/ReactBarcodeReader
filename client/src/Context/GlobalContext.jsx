@@ -2,7 +2,7 @@ import { createContext } from 'react'
 
 const GlobalContext = createContext({
     isToggle: false,
-    setToggle: null
+    setToggle: null,
 });
 
 export default GlobalContext

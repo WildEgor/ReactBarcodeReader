@@ -1,6 +1,6 @@
-import React, { Component } from "react";
+import React, { useState, useEffect, useContext, useCallback } from "react";
 import "./Home.css";
-import axios from "axios";
+import Axios from 'axios'
 import { PuffLoader } from 'react-spinners';
 // Components
 import HomeTable from "../../components/HomeTable/HomeTable"
@@ -8,86 +8,95 @@ import SearchBar from "../../components/SearchBar/SearchBar";
 import Scanner from '../../components/Scanner/Scanner'
 import GlobalContext from '../../Context/GlobalContext';
 
-class Home extends Component {
-  state = {
-    barcode: "",
-    data: null,
-    allItems: null,
-    error: "",
-    query: ""
-  };
+import axios from "axios";
 
-  async componentDidMount() {
-    try {
-      const items = await axios("/api/items/");
-      this.setState({ data: items.data })
-      this.searchItems("", 'articul')
-    } catch (err) {
-      this.setState({ error: err.message });
+const Home = props => {
+  const globalVar = useContext(GlobalContext)
+  const [barcode, setBarcode] = useState("")
+  const [allItems, setAllItems] = useState([])
+  const [dataItems, setDataItems] = useState([])
+  const [errors, setErrors] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
+
+  useEffect(() => {
+    const getData = async () => {
+      try {
+        const items = await axios("/api/items/");
+        console.log('Items ', items)
+        setAllItems(items.data.items)
+        setDataItems(items.data.items)
+      } catch (err) {
+        setErrors(err.message);
+      }
     }
+    getData()
+  }, [])
+
+  useEffect(() => {
+    console.log('All', allItems)
+  }, [allItems])
+
+  const getBarcode = barCode => {
+    setBarcode(barCode.codeResult.code)
   }
 
-  getBarcode = barCode => {
-    this.setState({barcode: barCode.codeResult.code})
-  }
-  
-  removeItems = async id => {
+  const removeItems = async id => {
     console.log('Try delete...')
     try {
-      const itemRemoved = await axios.delete(`/api/items/${id}`);
-      const items = await axios("/api/items/");
-      this.setState({ data: items.data });
+      // refetchDel({
+      //   url: `/items/${id}`
+      // })
+      // refetchGet()
     } catch (err) {
-      this.setState({ error: err.message });
+      setErrors( err.message );
     }
   };
 
-  searchItems = async (username, query) => {
-    
-    let allItems = [...this.state.data.items];
+  const searchItems = async (username, query) => {
+    //let allItems = [...dataGet.items];
+    let allItems = [...dataItems]; 
     let isFound = false;
-    if (this.state.allItems === null) this.setState({ allItems });
+    if (allItems === null) setAllItems(allItems);
 
-    let items = this.state.data.items.filter(item => {
-      return (item[query].toLowerCase().includes(username.toLowerCase()) && item[query].length === username.length)
+    if (allItems.length) {
+      var items = allItems.filter(item => {
+        return (item[query].toLowerCase().includes(username.toLowerCase()) && item[query].length === username.length)
+      }
+      );
+      setAllItems(items);
+
+      if (items.length) isFound = true
+      if (username.trim() === "") setAllItems(allItems);
     } 
-    );
 
-    if (items.length > 0) {
-      isFound = true
-      this.setState({ data: { items } });
-    } else {
-      isFound = false
-    }
-
-    if (username.trim() === ""){
-      this.setState({ data: { items: this.state.allItems } });
-      return isFound
-    }
-  
     return isFound
   };
 
-  render(){
-    if (!this.state.data)
-      return <div className="Spinner-Wrapper"> <PuffLoader size={"100px"} color={'#333'} /> </div>;
-
-    if (this.state.error) return <h1>{this.state.error}</h1>;
-      if (!this.state.data.items.length)
-        return <h1 className="No-Students">В базе данных отсутствуют записи!</h1>;
-
+  if (isLoading) 
+    return <div className="Spinner-Wrapper"><PuffLoader size={"100px"} color={'#333'} /> </div>;
+  if (errors) 
+    return <h1>{errors}</h1>;
+  if (allItems){
     return (
       <div className="Table-Wrapper">
-      <GlobalContext.Consumer>
-        {({isToggle}) => { if (isToggle) return ( <Scanner onDetected={this.getBarcode} /> ) }}
-      </GlobalContext.Consumer>
+      {globalVar.isToggle && <Scanner onDetected={getBarcode} />}
         <div className="Table-Search">
-          <SearchBar searchItems={this.searchItems} scannerSearch={this.state.barcode}/>
+          <SearchBar searchItems={searchItems} scannerSearch={barcode}/>
         </div>
-        <HomeTable table={ this.state.data.items } removeItems={ this.removeItems }/>
+          <HomeTable table={ allItems } removeItems={ removeItems }/>
       </div>
     );
   }
+
+  return(
+    <div className="Table-Wrapper">
+    {globalVar.isToggle && <Scanner onDetected={getBarcode} />}
+      <div className="Table-Search">
+        <SearchBar searchItems={searchItems} scannerSearch={barcode}/>
+      </div>
+        <h1 className="No-Students">В базе данных отсутствуют записи!</h1>;
+    </div>
+  ) 
 }
 
 export default Home;

@@ -1,6 +1,6 @@
 import './AddItem.css';
 
-import React, { useState, useEffect, Fragment } from "react";
+import React, { useState, useEffect, Fragment, useContext } from "react";
 import axios from "axios";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -56,7 +56,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const AddItem = props => {
-  const classes = useStyles();
+  
+  const classes = useStyles()
   const [showDialog, setShowDialog] = useState(false)
   const [itemList, setItemList] = useState([])
   const [isFound, setIsFound] = useState(false)
