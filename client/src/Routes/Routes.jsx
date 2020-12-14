@@ -13,7 +13,7 @@ const Routes = () => {
 
   return (
     <Fragment>
-      <GlobalContext.Provider value={{isToggle, setToggle}}>
+      <GlobalContext.Provider value={{ isToggle, setToggle }}>
         <NavBar />
         <Switch>
           <Route path="/" component={ Home } exact />

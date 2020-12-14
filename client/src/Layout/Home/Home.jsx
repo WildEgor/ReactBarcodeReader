@@ -4,7 +4,7 @@ import axios from "axios";
 import { PuffLoader } from 'react-spinners';
 // Components
 import HomeTable from "../../components/HomeTable/HomeTable"
-import SearchStudents from "../../components/SearchStudent/SearchStudents";
+import SearchBar from "../../components/SearchBar/SearchBar";
 import Scanner from '../../components/Scanner/Scanner'
 import GlobalContext from '../../Context/GlobalContext';
 
@@ -12,16 +12,16 @@ class Home extends Component {
   state = {
     barcode: "",
     data: null,
-    allStudents: null,
+    allItems: null,
     error: "",
     query: ""
   };
 
   async componentDidMount() {
     try {
-      const students = await axios("/api/items/");
-      this.setState({ data: students.data })
-      this.searchStudents("", 'articul')
+      const items = await axios("/api/items/");
+      this.setState({ data: items.data })
+      this.searchItems("", 'articul')
     } catch (err) {
       this.setState({ error: err.message });
     }
@@ -31,37 +31,37 @@ class Home extends Component {
     this.setState({barcode: barCode.codeResult.code})
   }
   
-  removeStudent = async id => {
+  removeItems = async id => {
     console.log('Try delete...')
     try {
-      const studentRemoved = await axios.delete(`/api/items/${id}`);
-      const students = await axios("/api/items/");
-      this.setState({ data: students.data });
+      const itemRemoved = await axios.delete(`/api/items/${id}`);
+      const items = await axios("/api/items/");
+      this.setState({ data: items.data });
     } catch (err) {
       this.setState({ error: err.message });
     }
   };
 
-  searchStudents = async (username, query) => {
+  searchItems = async (username, query) => {
     
-    let allStudents = [...this.state.data.students];
+    let allItems = [...this.state.data.items];
     let isFound = false;
-    if (this.state.allStudents === null) this.setState({ allStudents });
+    if (this.state.allItems === null) this.setState({ allItems });
 
-    let students = this.state.data.students.filter(item => {
+    let items = this.state.data.items.filter(item => {
       return (item[query].toLowerCase().includes(username.toLowerCase()) && item[query].length === username.length)
     } 
     );
 
-    if (students.length > 0) {
+    if (items.length > 0) {
       isFound = true
-      this.setState({ data: { students } });
+      this.setState({ data: { items } });
     } else {
       isFound = false
     }
 
     if (username.trim() === ""){
-      this.setState({ data: { students: this.state.allStudents } });
+      this.setState({ data: { items: this.state.allItems } });
       return isFound
     }
   
@@ -73,7 +73,7 @@ class Home extends Component {
       return <div className="Spinner-Wrapper"> <PuffLoader size={"100px"} color={'#333'} /> </div>;
 
     if (this.state.error) return <h1>{this.state.error}</h1>;
-      if (!this.state.data.students.length)
+      if (!this.state.data.items.length)
         return <h1 className="No-Students">В базе данных отсутствуют записи!</h1>;
 
     return (
@@ -82,9 +82,9 @@ class Home extends Component {
         {({isToggle}) => { if (isToggle) return ( <Scanner onDetected={this.getBarcode} /> ) }}
       </GlobalContext.Consumer>
         <div className="Table-Search">
-          <SearchStudents searchStudents={this.searchStudents} scannerSearch={this.state.barcode}/>
+          <SearchBar searchItems={this.searchItems} scannerSearch={this.state.barcode}/>
         </div>
-        <HomeTable table={ this.state.data.students } removeItem={ this.removeStudent }/>
+        <HomeTable table={ this.state.data.items } removeItems={ this.removeItems }/>
       </div>
     );
   }

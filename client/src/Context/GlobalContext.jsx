@@ -1,5 +1,8 @@
-import React from "react";
+import { createContext } from 'react'
 
-const GlobalContext = React.createContext({});
+const GlobalContext = createContext({
+    isToggle: false,
+    setToggle: null
+});
 
 export default GlobalContext

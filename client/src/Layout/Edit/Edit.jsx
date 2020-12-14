@@ -1,10 +1,10 @@
 import React, { Fragment } from 'react';
-import EditStudent from '../../components/EditStudent/EditStudent';
+import EditItem from '../../components/EditItem/EditItem';
 
 const Edit = () => {
   return (
     <Fragment>
-      <EditStudent />
+      <EditItem />
     </Fragment>
   );
 };

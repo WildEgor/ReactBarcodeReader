@@ -55,7 +55,7 @@ function soldValidator(value) {
 }
 
 function remindValidator(value) {
-  return value == this.countAll - this.sold;
+  return value == (this.countAll - this.sold);
 }
 
 itemsSchema.set('validateBeforeSave', true);

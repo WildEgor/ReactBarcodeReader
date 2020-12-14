@@ -1,10 +1,10 @@
 import React, { Fragment } from 'react';
-import AddStudent from '../../components/AddStudent/AddStudent';
+import AddItem from '../../components/AddItem/AddItem';
 
 const Add = props => {
   return (
     <Fragment>
-      <AddStudent />
+      <AddItem />
     </Fragment>
   );
 };

@@ -60,7 +60,7 @@ const useStyles = makeStyles((theme) => ({
                       if (column.id == "changer"){
                           return (
                           <TableCell key={rows._id} align={"right"}>
-                            <RemoveDialog onRemove ={props.removeItem} item={rows}></RemoveDialog>
+                            <RemoveDialog onRemove ={props.removeItems} item={rows}></RemoveDialog>
                             <Link to={{ pathname: '/edit', search: rows._id }}>
                             <Button
                                 variant="contained"

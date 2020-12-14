@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import './EditStudent.css';
+import './EditItem.css';
 import axios from "axios";
 import { withRouter } from 'react-router'
 import {toast, ToastContainer} from "react-toastify";
@@ -35,7 +35,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const EditStudent = props => {
+const EditItem = props => {
   const classes = useStyles();
   const [info, setInfo] = useState({
     id: '',
@@ -54,8 +54,8 @@ const EditStudent = props => {
     try {
       let search =  props.location.search,
       id = search.substring(1, search.length);
-      const updateStudent = await axios(`/api/items/${id}`);
-      const { articul, desc, countAll, sold, remind, notes } = updateStudent.data.student;
+      const updateItem = await axios(`/api/items/${id}`);
+      const { articul, desc, countAll, sold, remind, notes } = updateItem.data.item;
       setInfo({ id, articul, desc, countAll, sold, remind, notes  });
       renderForm({ id, articul, desc, countAll, sold, remind, notes  })
       return { id, articul, desc, countAll, sold, remind, notes  }
@@ -81,17 +81,17 @@ const EditStudent = props => {
           uiSchema={ {...uiSchema, "ui:title": "Изменить товар"} } 
           // addFunc = { formdata => {return formdata}}
           addFunc = { autoComplete }
-          onSubmitData={ updateStudentHandler } 
+          onSubmitData={ updateItemHandler } 
           validateFunc={ validate }
           mUIClasses={ classes }
       />
     )
   }
 
-  const updateStudentHandler = async (e, data) => {
+  const updateItemHandler = async (e, data) => {
     e.preventDefault();
     try {
-      const student = await axios.put(`/api/items/${data.id}`, {
+      const item = await axios.put(`/api/items/${data.id}`, {
           articul: data.articul,
           desc: data.desc,
           countAll: data.countAll,
@@ -99,7 +99,7 @@ const EditStudent = props => {
           remind: data.remind,
           notes: data.notes
       });
-      toast(student.data.message ,{ type: toast.TYPE.INFO, autoClose: 3000 });
+      toast(item.data.message ,{ type: toast.TYPE.INFO, autoClose: 3000 });
 
     } catch (err) {
       toast(err.message ,{ type: toast.TYPE.ERROR, autoClose: 3000 });
@@ -122,4 +122,4 @@ const EditStudent = props => {
   )
 }
 
-export default withRouter(EditStudent);
+export default withRouter(EditItem);

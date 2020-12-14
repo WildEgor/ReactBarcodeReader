@@ -1,10 +1,7 @@
 import React, { Fragment, useState, useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
-import TableCell from "@material-ui/core/TableCell";
 import TableContainer from "@material-ui/core/TableContainer";
-import TableHead from "@material-ui/core/TableHead";
-import TableRow from "@material-ui/core/TableRow";
 import TableBody from "@material-ui/core/TableBody";
 import Paper from "@material-ui/core/Paper";
 
@@ -123,7 +120,7 @@ const useStyles = makeStyles({
                     <TableBody>
                     {
                         props.table ? 
-                            <ItemRow data={props.table} col={columns} removeItem={props.removeItem} order={order} orderBy={orderBy}/>
+                            <ItemRow data={props.table} col={columns} removeItems={props.removeItems} order={order} orderBy={orderBy}/>
                             : <div className="Spinner-Wrapper"> <PropagateLoader color={'#333'} /> </div>
                     }
                     </TableBody>

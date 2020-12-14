@@ -1,4 +1,4 @@
-import './AddStudent.css';
+import './AddItem.css';
 
 import React, { useState, useEffect, Fragment } from "react";
 import axios from "axios";
@@ -55,13 +55,13 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const AddStudent = props => {
+const AddItem = props => {
   const classes = useStyles();
   const [showDialog, setShowDialog] = useState(false)
   const [itemList, setItemList] = useState([])
   const [isFound, setIsFound] = useState(false)
 
-  const addStudent = (e, data) => {
+  const addItem = (e, data) => {
     e.preventDefault();
     searchItems('articul', data).then(
       async (itemList) => {
@@ -69,7 +69,7 @@ const AddStudent = props => {
         let isExist = itemList.length ? true : false;
         if (!isExist){
           try {
-            let newStudent = await axios.post("/api/items", {
+            let newItem = await axios.post("/api/items", {
               articul: data.articul,
               desc: data.desc,
               countAll: data.countAll,
@@ -78,7 +78,7 @@ const AddStudent = props => {
               notes: data.notes
             })
             toast(
-              "Товар " + newStudent.data.newStudent.articul + " успешно добавлен" ,
+              "Товар " + newItem.data.newItem.articul + " успешно добавлен" ,
               { type: toast.TYPE.SUCCESS, 
                 autoClose: 3000,
                 //onClose:  resetForm
@@ -115,8 +115,8 @@ const AddStudent = props => {
     console.log('Search data', query, data)
     try {
     setIsFound(true)
-    const allStudents = await axios("/api/items/")
-    let items = allStudents.data.students.filter(item => {
+    const allItems = await axios("/api/items/")
+    let items = allItems.data.items.filter(item => {
       if (item[query].toLowerCase() !== data[query].toLowerCase())
         return false
       return true
@@ -145,7 +145,7 @@ const AddStudent = props => {
             return no
           } } 
           uiSchema={ {...uiSchema, "ui:title": "Добавить товар"} } 
-          onSubmitData={ addStudent } 
+          onSubmitData={ addItem } 
           addFunc={ (formData) => {
             if (formData.countAll < formData.sold)
               formData.sold = formData.countAll
@@ -166,4 +166,4 @@ const AddStudent = props => {
     );
 }
 
-export default withRouter(AddStudent);
+export default withRouter(AddItem);

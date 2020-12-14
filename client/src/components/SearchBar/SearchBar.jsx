@@ -1,6 +1,6 @@
 import React, {Fragment, useState, useEffect } from "react";
 import { Link } from 'react-router-dom';
-import "./SearchStudents.css";
+import "./SearchBar.css";
 
 import CreateIcon from '@material-ui/icons/Create';
 import { makeStyles } from '@material-ui/core/styles';
@@ -43,7 +43,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const SearchStudents = props => {
+const SearchItems = props => {
   const classes = useStyles()
   const [searchItemList, setSearchItemList] = useState({
     articul: 'Артикул',
@@ -98,7 +98,7 @@ const SearchStudents = props => {
   const letSearch = query => {
     console.log('Search event')
     setValue(query)
-    let isFound = props.searchStudents(query, searchItem) // Передаем запрос к родителю и делаем поиск
+    let isFound = props.searchItems(query, searchItem) // Передаем запрос к родителю и делаем поиск
     isFound.then(resolve => setIsFound(resolve)) // Если найдено что-то устанавливаем флаг
   }
 
@@ -149,4 +149,4 @@ const SearchStudents = props => {
   );
 }
 
-export default SearchStudents;
+export default SearchItems;
