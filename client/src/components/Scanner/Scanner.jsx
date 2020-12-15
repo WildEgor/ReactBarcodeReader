@@ -11,7 +11,7 @@ import Paper from '@material-ui/core/Paper';
 const useStyles = makeStyles((theme) => ({
     root: {
         [theme.breakpoints.down('xs')]: {
-            width: "100vh",
+            width: "100%",
             flexDirection: "column",
           },
           [theme.breakpoints.up('lg')]: {
@@ -22,22 +22,23 @@ const useStyles = makeStyles((theme) => ({
         alignItems: "center"
     },
     paper: {
-      padding: theme.spacing(2),
+      //padding: theme.spacing(2),
       textAlign: 'center',
       color: theme.palette.text.secondary,
     },
     item: {
         [theme.breakpoints.down('xs')]: {
-            width: "50vh",
+            width: "50%",
           },
         [theme.breakpoints.up('lg')]: {
-            width: "50vh",
+            width: "50%",
             },
     },
     scanner: {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
+        marginTop: "25px"
     },
     itemBox: {
         display: "flex",
@@ -139,7 +140,6 @@ const Scanner = props => {
     }
     
     const _onDetected = result => {
-        console.log('RESULT IS', result)
         props.onDetected(result)
         setResult( results.concat( [ result ] ) )
     }
@@ -161,37 +161,31 @@ const Scanner = props => {
     }
 
     useEffect(() => {
-            Quagga.onDetected(_onDetected)
-            Quagga.onProcessed(_onProcessed)
+        Quagga.onDetected(_onDetected)
+        Quagga.onProcessed(_onProcessed)
         return () => { 
             Quagga.offDetected(_onDetected) 
         }
     })
 
     useEffect(() => {
-        console.log('NEW CONFIG IS: ', config)
-    }, [config])
-
-    useEffect(() => {
         _UpdateScanner()
     }, [])
     
     return (
-    
         <Grid container spacing={2} className={classes.scanner}>
-        <Paper elevation={3} className={classes.root}>
-            <Grid item className={classes.item} lg={10} sm={8} xs={12}>
-                <Box className="vieport-wrapper" color="text.primary"/>
-                <Box id="interactive" className="viewport"/>
-            </Grid>
-            <Grid item className={classes.item} lg={2} sm={4} xs={12} >
-                <Box className={classes.itemBox}>
-                    <ScannerSettings updateSettings={_shouldComponentUpdate} />
-                </Box>
-            </Grid>
-        </Paper> 
-    </Grid> 
-    
+            <Paper elevation={3} className={classes.root}>
+                <Grid item className={classes.item} lg={10} sm={8} xs={12}>
+                    <Box className="vieport-wrapper" color="text.primary"/>
+                    <Box id="interactive" className="viewport"/>
+                </Grid>
+                <Grid item className={classes.item} lg={2} sm={4} xs={12} >
+                    <Box className={classes.itemBox}>
+                        <ScannerSettings updateSettings={_shouldComponentUpdate} />
+                    </Box>
+                </Grid>
+            </Paper> 
+        </Grid> 
     );
 }
 

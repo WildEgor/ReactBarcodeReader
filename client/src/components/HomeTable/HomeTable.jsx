@@ -15,8 +15,8 @@ const useStyles = makeStyles({
         width: "100%"
     },
     container: {
-        width: "80%",
-        maxHeight: 600
+        width: "100%",
+        maxHeight: 800
     },
     visuallyHidden: {
         border: 0,
@@ -109,7 +109,7 @@ const useStyles = makeStyles({
     return (
         <Fragment>
             <TableContainer className={classes.container} component={Paper}>
-                <Table stickyHeader aria-label="sticky table" size="small">
+                <Table stickyHeader aria-label="sticky table" size="large">
                     <EnhancedHomeTableHead 
                       classes={classes}
                       headCells={columns}

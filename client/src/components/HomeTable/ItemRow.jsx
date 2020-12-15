@@ -53,7 +53,7 @@ const ItemRow = props => {
       //.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
       .map(rows => {
         return (
-          <TableRow tabIndex={-1} key={rows._id}>
+          <TableRow tabIndex={-1} key={rows._id} id={rows._id}>
             {
                 props.col.map((column) => {
                     const value = rows[column.id];

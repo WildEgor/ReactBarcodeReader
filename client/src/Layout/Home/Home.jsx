@@ -1,14 +1,14 @@
-import React, { useState, useEffect, useContext, useCallback } from "react";
-import "./Home.css";
-import Axios from 'axios'
+import React, { useState, useEffect, useContext } from "react";
 import { PuffLoader } from 'react-spinners';
+import axios from "axios";
+
 // Components
 import HomeTable from "../../components/HomeTable/HomeTable"
 import SearchBar from "../../components/SearchBar/SearchBar";
 import Scanner from '../../components/Scanner/Scanner'
 import GlobalContext from '../../Context/GlobalContext';
 
-import axios from "axios";
+import Container from '@material-ui/core/Container';
 
 const Home = props => {
   const globalVar = useContext(GlobalContext)
@@ -18,17 +18,20 @@ const Home = props => {
   const [errors, setErrors] = useState("")
   const [isLoading, setIsLoading] = useState(false)
 
-  useEffect(() => {
-    const getData = async () => {
-      try {
-        const items = await axios("/api/items/");
-        console.log('Items ', items)
-        setAllItems(items.data.items)
-        setDataItems(items.data.items)
-      } catch (err) {
-        setErrors(err.message);
-      }
+  const getData = async () => {
+    setIsLoading(true)
+    try {
+      const { data } = await axios("/api/items/");
+      setAllItems(data.items)
+      setDataItems(data.items)
+      setIsLoading(false)
+    } catch (err) {
+      setErrors(err.message);
+      setIsLoading(false)
     }
+  }
+
+  useEffect(() => {
     getData()
   }, [])
 
@@ -42,18 +45,18 @@ const Home = props => {
 
   const removeItems = async id => {
     console.log('Try delete...')
+    setIsLoading(true)
     try {
-      // refetchDel({
-      //   url: `/items/${id}`
-      // })
-      // refetchGet()
+      const removeItems = await axios.delete(`/api/items/${id}`)
+      setIsLoading(false)
     } catch (err) {
       setErrors( err.message );
+      setIsLoading(false)
     }
+    getData()
   };
 
   const searchItems = async (username, query) => {
-    //let allItems = [...dataGet.items];
     let allItems = [...dataItems]; 
     let isFound = false;
     if (allItems === null) setAllItems(allItems);
@@ -73,29 +76,25 @@ const Home = props => {
   };
 
   if (isLoading) 
-    return <div className="Spinner-Wrapper"><PuffLoader size={"100px"} color={'#333'} /> </div>;
+    return <Container><PuffLoader size={"100px"} color={'#333'} /> </Container>;
   if (errors) 
     return <h1>{errors}</h1>;
   if (allItems){
     return (
-      <div className="Table-Wrapper">
+      <Container maxWidth="lg">
       {globalVar.isToggle && <Scanner onDetected={getBarcode} />}
-        <div className="Table-Search">
           <SearchBar searchItems={searchItems} scannerSearch={barcode}/>
-        </div>
           <HomeTable table={ allItems } removeItems={ removeItems }/>
-      </div>
+      </Container>
     );
   }
 
   return(
-    <div className="Table-Wrapper">
+    <Container maxWidth="lg">
     {globalVar.isToggle && <Scanner onDetected={getBarcode} />}
-      <div className="Table-Search">
         <SearchBar searchItems={searchItems} scannerSearch={barcode}/>
-      </div>
         <h1 className="No-Students">В базе данных отсутствуют записи!</h1>;
-    </div>
+    </Container>
   ) 
 }
 

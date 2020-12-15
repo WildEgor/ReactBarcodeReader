@@ -1,6 +1,5 @@
 import React, {Fragment, useState, useEffect } from "react";
 import { Link } from 'react-router-dom';
-import "./SearchBar.css";
 
 import CreateIcon from '@material-ui/icons/Create';
 import { makeStyles } from '@material-ui/core/styles';
@@ -23,7 +22,7 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: "column",
     justifyContent: "start",
     alignItems: 'left',
-    width: "80vw",
+    width: "100%",
     margin: "15px 0 15px 0"
   },
   button: {

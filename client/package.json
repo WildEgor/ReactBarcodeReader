@@ -10,6 +10,7 @@
     "axios": "^0.18.1",
     "axios-hooks": "^2.2.0",
     "chroma-js": "^2.1.0",
+    "materialize-css": "^1.0.0-rc.2",
     "quagga": "^0.12.1",
     "react": "^16.14.0",
     "react-dom": "^16.14.0",

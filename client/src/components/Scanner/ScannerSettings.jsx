@@ -16,7 +16,7 @@ const useStyles = makeStyles((theme) => ({
         flexDirection: "column",
       margin: theme.spacing(1),
       minWidth: 120,
-      maxWidth: 240,
+      maxWidth: 150,
     },
     chips: {
       display: 'flex',
